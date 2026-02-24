@@ -1,0 +1,43 @@
+﻿<div class="container-fluid">
+    <div class="card shadow mb-4">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Purchase Order Management</h5>
+            <span class="badge bg-info">Status: Pending Approval</span>
+        </div>
+        <div class="card-body">
+            <form>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <label class="form-label">PO Classification</label>
+                        <select class="form-select border-primary">
+                            <option value="Medical">Medical PO</option>
+                            <option value="Non-Medical">Non-Medical PO</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Total Amount (PHP)</label>
+                        <input type="number" class="form-control" id="poAmount" placeholder="0.00">
+                        <small class="text-muted">Determines approval route (Admin/Medical Dir vs Assistant to President)</small>
+                    </div>
+                </div>
+
+                <h6>Required Documentation</h6>
+                <div class="list-group mb-4">
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div><i class="fas fa-file-pdf me-2"></i>Approved Comparative Summary</div>
+                        <button type="button" class="btn btn-sm btn-outline-secondary">View</button>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div><i class="fas fa-file-invoice me-2"></i>Vendor Quotations</div>
+                        <button type="button" class="btn btn-sm btn-outline-secondary">View</button>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-success"><i class="fas fa-check me-1"></i>Submit for Final Approval</button>
+                    <button type="button" class="btn btn-danger"><i class="fas fa-times me-1"></i>Archive/Disapprove</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
