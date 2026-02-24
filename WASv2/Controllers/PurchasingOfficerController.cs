@@ -4,7 +4,7 @@ using WASv2.Models;
 
 namespace WASv2.Controllers
 {
-    public class PagesController : Controller
+    public class PurchasingOfficerController : Controller
     {
         public IActionResult Index()
         {

@@ -27,7 +27,7 @@ namespace WASv2
             app.MapStaticAssets();
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Pages}/{action=Index}/{id?}")
+                pattern: "{controller=PurchasingOfficer}/{action=Index}/{id?}")
                 .WithStaticAssets();
             /**app.MapControllerRoute(
                 name: "workflow",
