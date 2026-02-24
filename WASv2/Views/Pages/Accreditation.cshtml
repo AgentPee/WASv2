@@ -1,46 +1,87 @@
-﻿<div class="row">
-    <div class="col-md-4">
-        <div class="card mb-4">
-            <div class="card-header">Accreditation Status</div>
-            <div class="card-body text-center">
-                <h3 class="text-warning">Pending Review</h3>
-                <p class="text-muted">Submitted on: Feb 24, 2026</p>
+﻿<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Supplier Accreditation Requests</h2>
+        <span class="badge bg-primary">VML Enrollment Portal</span>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-header bg-light">
+            <ul class="nav nav-tabs card-header-tabs">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#">Pending Review</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">For MANCOM Approval</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Active (VML)</a>
+                </li>
+            </ul>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Company Name</th>
+                            <th>Classification</th>
+                            <th>Date Submitted</th>
+                            <th>Document Status</th>
+                            <th>Current Stage</th>
+                            <th class="text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <strong>Global Tech Solutions</strong><br>
+                                <small class="text-muted">Rep: Jane Doe</small>
+                            </td>
+                            <td>
+                                <span class="badge bg-secondary">IT - Hardware/Software</span>
+                            </td>
+                            <td>Feb 24, 2026</td>
+                            <td>
+                                <span class="text-success small"><i class="fas fa-check-circle"></i> SEC Certificate</span><br>
+                                <span class="text-danger small"><i class="fas fa-times-circle"></i> Business Permit Missing</span>
+                            </td>
+                            <td>
+                                <span class="badge rounded-pill bg-warning text-dark">Pending Review</span>
+                            </td>
+                            <td class="text-center">
+                                <a asp-controller="Pages" asp-action="AccreditationDetails" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-eye"></i> Review Application
+                                </a>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                <strong>MedEquip Inc.</strong><br>
+                                <small class="text-muted">Rep: John Smith</small>
+                            </td>
+                            <td>
+                                <span class="badge bg-secondary">Medical Equipment</span>
+                            </td>
+                            <td>Feb 20, 2026</td>
+                            <td>
+                                <span class="text-success small"><i class="fas fa-check-circle"></i> All Documents Uploaded</span>
+                            </td>
+                            <td>
+                                <span class="badge rounded-pill bg-info text-white">For MANCOM Approval</span>
+                            </td>
+                            <td class="text-center">
+                                <button class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-eye"></i> View Summary
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
-    </div>
-    <div class="col-md-8">
-        <div class="card">
-            <div class="card-header">Supplier Profile Update</div>
-            <div class="card-body">
-                <div class="row g-3">
-                    <div class="col-md-12">
-                        <label class="form-label">Company Name</label>
-                        <input type="text" class="form-control" id="companyName">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Classification</label>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="it">
-                            <label class="form-check-label">IT - Hardware/Software</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="med">
-                            <label class="form-check-label">Medical Supplies</label>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Required Documents</label>
-                        <ul class="list-group small">
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                SEC Certificate <span class="badge bg-success">Uploaded</span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                Business Permit <span class="badge bg-danger">Missing</span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
+        <div class="card-footer text-muted small">
+            System Action: Logs all review actions in the audit trail for compliance[cite: 313].
         </div>
     </div>
 </div>

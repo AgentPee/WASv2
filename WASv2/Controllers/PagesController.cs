@@ -26,7 +26,12 @@ namespace WASv2.Controllers
             return View();
         }
         
-        public IActionResult Accreditation()
+        public IActionResult AccreditationDetails()
+        {
+            return View();
+        }
+
+        public IActionResult DeliveryDetails()
         {
             return View();
         }
@@ -52,6 +57,11 @@ namespace WASv2.Controllers
         }
 
         public IActionResult CreateRFQ()
+        {
+            return View();
+        }
+
+        public IActionResult Accreditation()
         {
             return View();
         }
