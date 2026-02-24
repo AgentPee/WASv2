@@ -1,0 +1,43 @@
+﻿<div class="card shadow">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">New Request for Quotation</h5>
+    </div>
+    <div class="card-body">
+        <form asp-action="PostRFQ" method="post" enctype="multipart/form-data">
+            <div class="row mb-3">
+                <div class="col-md-8">
+                    <label class="form-label">RFQ Title</label>
+                    <input type="text" class="form-control" placeholder="e.g., IT Hardware Replacement 2026" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Submission Deadline</label>
+                    <input type="date" class="form-control" required>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Description & Specifications</label>
+                <textarea class="form-control" rows="4" placeholder="Enter detailed quantity and specs..."></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Select Supplier Category</label>
+                <select class="form-select">
+                    <option>IT - Hardware</option>
+                    <option>Medical Supplies</option>
+                    <option>Engineering - Electrical</option>
+                </select>
+                <small class="text-muted">RFQ will only be visible to accredited suppliers in this category[cite: 309].</small>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Attachments (Sketches/Docs)</label>
+                <input type="file" class="form-control" multiple>
+            </div>
+
+            <div class="border-top pt-3 d-flex justify-content-end">
+                <button type="submit" class="btn btn-success">Review and Post to Supplier Portal</button>
+            </div>
+        </form>
+    </div>
+</div>

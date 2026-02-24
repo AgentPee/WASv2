@@ -51,6 +51,11 @@ namespace WASv2.Controllers
             return View();
         }
 
+        public IActionResult CreateRFQ()
+        {
+            return View();
+        }
+
         public IActionResult Privacy() 
         {
             return View();
