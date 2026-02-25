@@ -26,13 +26,13 @@ namespace WASv2
 
             app.MapStaticAssets();
             app.MapControllerRoute(
-                name: "default",
+                name: "PurchasingOfficer",
                 pattern: "{controller=PurchasingOfficer}/{action=Index}/{id?}")
                 .WithStaticAssets();
-            /**app.MapControllerRoute(
-                name: "workflow",
-                pattern: "{controller=Workflow}/{action=Index}/{id?}")
-                .WithStaticAssets();**/
+            app.MapControllerRoute(
+                name: "DepartmentHead",
+                pattern: "{controller=DepartmentHead}/{action=Index}/{id?}")
+                .WithStaticAssets();
 
             app.Run();
         }

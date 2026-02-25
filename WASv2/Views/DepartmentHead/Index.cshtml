@@ -1,0 +1,92 @@
+﻿<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3">Department Head Control Panel</h1>
+        <div class="text-end">
+            <span class="badge bg-primary p-2">Role: Dept Head - IT</span>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Pending PRs</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">12 Requests</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Unsigned Memos</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">4 PRMs</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Project Acceptance</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">2 Pending CA</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+            <h6 class="m-0 font-weight-bold text-primary">Priority Approval Queue</h6>
+            <div class="dropdown no-arrow">
+                <button class="btn btn-sm btn-outline-secondary">Filter by Module</button>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Module</th>
+                            <th>Reference ID</th>
+                            <th>Requestor</th>
+                            <th>Summary</th>
+                            <th>Status</th>
+                            <th class="text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="badge bg-secondary">PR</span></td>
+                            <td>#PR-2026-0045</td>
+                            <td>Admin Staff (IT)</td>
+                            <td>Server Hardware Replenishment</td>
+                            <td><span class="text-primary"><i class="fas fa-clock"></i> Awaiting Review</span></td>
+                            <td class="text-center">
+                                <a asp-action="ReviewPR" class="btn btn-sm btn-primary">Open & Review</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge bg-warning text-dark">PRM</span></td>
+                            <td>#PRM-INV-992</td>
+                            <td>Accounts Staff</td>
+                            <td>Cloud Subscription - Q1</td>
+                            <td><span class="text-danger"><i class="fas fa-pen-nib"></i> Signature Required</span></td>
+                            <td class="text-center">
+                                <a asp-action="SignMemo" class="btn btn-sm btn-success">E-Sign Now</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge bg-info">CA</span></td>
+                            <td>#JO-2026-881</td>
+                            <td>Warehouse/PAM</td>
+                            <td>Network Cabling Completion</td>
+                            <td><span class="text-dark"><i class="fas fa-star"></i> Pending Rating</span></td>
+                            <td class="text-center">
+                                <a asp-action="Acceptance" class="btn btn-sm btn-dark">Rate & Accept</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
