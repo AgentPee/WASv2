@@ -1,0 +1,44 @@
+﻿<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">Initiate New Purchase Request</div>
+                <div class="card-body">
+                    <form>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">PR Number</label>
+                                <input type="text" class="form-control" placeholder="Manual/System Generated">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Budget Confirmation</label>
+                                <select class="form-select">
+                                    <option>Confirmed (Stock Replenishment)</option>
+                                    <option>Subject for Approval</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Upload PRF (Scanned/PDF)</label>
+                            <input type="file" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Remarks/Reason</label>
+                            <textarea class="form-control" rows="3"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Submit to Dept Head</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow">
+                <div class="card-header">Recent Activity</div>
+                <ul class="list-group list-group-flush small">
+                    <li class="list-group-item text-success">PR-2026-001 Approved by Head</li>
+                    <li class="list-group-item text-danger">PR-2026-002 Disapproved: Missing specs</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

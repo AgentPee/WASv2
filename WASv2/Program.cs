@@ -37,6 +37,10 @@ namespace WASv2
                 name: "DepartmentAdminStaff",
                 pattern: "{controller=DepartmentAdminStaff}/{action=Index}/{id?}")
                 .WithStaticAssets();
+            app.MapControllerRoute(
+                name: "Supplier",
+                pattern: "{controller=Supplier}/{action=Index}/{id?}")
+                .WithStaticAssets();
 
             app.Run();
         }
