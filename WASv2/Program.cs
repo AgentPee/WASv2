@@ -41,6 +41,14 @@ namespace WASv2
                 name: "Supplier",
                 pattern: "{controller=Supplier}/{action=Index}/{id?}")
                 .WithStaticAssets();
+            app.MapControllerRoute(
+                name: "PamStaff",
+                pattern: "{controller=PamStaff}/{action=Index}/{id?}")
+                .WithStaticAssets();
+            app.MapControllerRoute(
+                name: "TopManagement",
+                pattern: "{controller=TopManagement}/{action=Index}/{id?}")
+                .WithStaticAssets();
 
             app.Run();
         }
