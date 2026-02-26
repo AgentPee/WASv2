@@ -8,10 +8,5 @@ namespace WASv2.Controllers
         {
             return View();
         }
-
-        public IActionResult SupplierPortal()
-        {
-            return View();
-        }
     }
 }
