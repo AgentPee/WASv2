@@ -1,0 +1,50 @@
+﻿@{
+    Layout = "_LayoutNoSidebar"; // A simplified layout without the internal sidebar
+}
+
+<div class="container d-flex align-items-center justify-content-center" style="min-height: 100vh;">
+    <div class="card shadow-lg border-0" style="max-width: 450px; width: 100%;">
+        <div class="card-header bg-primary text-white text-center py-4">
+            <h4 class="mb-0">W-AS Portal</h4>
+            <small>Workflow and Archiving System</small>
+        </div>
+        <div class="card-body p-4">
+            <form asp-action="Login" method="post">
+                <div class="mb-3">
+                    <label class="form-label">Email Address / Username</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                        <input type="text" class="form-control" name="username" required placeholder="name@company.com">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Password</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                        <input type="password" class="form-control" name="password" required>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-between mb-3 small">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="remember">
+                        <label class="form-check-label" for="remember">Remember me</label>
+                    </div>
+                    <a href="#" class="text-decoration-none">Forgot Password?</a>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 py-2 mb-3">Sign In</button>
+
+                <hr>
+
+                <div class="text-center mt-3">
+                    <p class="mb-1">Are you a new vendor?</p>
+                    <a asp-controller="Auth" asp-action="SignUp" class="btn btn-outline-success btn-sm w-100">
+                        <i class="fas fa-store me-2"></i>Apply for Accreditation
+                    </a>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer text-center py-3 bg-light">
+            <small class="text-muted">&copy; 2026 Procurement Division</small>
+        </div>
+    </div>
+</div>

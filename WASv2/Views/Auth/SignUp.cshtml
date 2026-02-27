@@ -1,0 +1,71 @@
+﻿@{
+    Layout = "_LayoutNoSidebar"; // A simplified layout without the internal sidebar
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow border-0">
+                <div class="card-body p-5">
+                    <h3 class="text-center mb-4">Supplier Accreditation Registration</h3>
+                    <p class="text-center text-muted mb-5">Begin your application to join the Vendor Master List (VML).</p>
+
+                    <form asp-action="Register" method="post">
+                        <h6 class="text-primary mb-3"><i class="fas fa-building me-2"></i>Company Information</h6>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-12">
+                                <label class="form-label">Company Name (as per SEC/DTI)</label>
+                                <input type="text" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Ownership Type</label>
+                                <select class="form-select">
+                                    <option>Single Proprietorship</option>
+                                    <option>Partnership</option>
+                                    <option>Corporation</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Year Established</label>
+                                <input type="number" class="form-control" placeholder="YYYY">
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label">Complete Business Address</label>
+                                <textarea class="form-control" rows="2"></textarea>
+                            </div>
+                        </div>
+
+                        <h6 class="text-primary mb-3"><i class="fas fa-id-card me-2"></i>Account Credentials</h6>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label">Business Email</label>
+                                <input type="email" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Contact Person</label>
+                                <input type="text" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Password</label>
+                                <input type="password" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Confirm Password</label>
+                                <input type="password" class="form-control" required>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-warning small">
+                            <i class="fas fa-info-circle me-2"></i>By registering, you agree to submit the required documentation (SEC, Business Permit, etc.) for review by the Purchasing Department.
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg">Create Supplier Account</button>
+                            <a asp-controller="Auth" asp-action="SignIn" class="btn btn-link">Already registered? Log in here</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

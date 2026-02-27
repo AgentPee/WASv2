@@ -26,6 +26,10 @@ namespace WASv2
 
             app.MapStaticAssets();
             app.MapControllerRoute(
+                name: "default",
+                pattern: "{controller=Home}/{action=Index}/{id?}")
+                .WithStaticAssets();
+            app.MapControllerRoute(
                 name: "PurchasingOfficer",
                 pattern: "{controller=PurchasingOfficer}/{action=Index}/{id?}")
                 .WithStaticAssets();
@@ -52,6 +56,10 @@ namespace WASv2
             app.MapControllerRoute(
                 name: "Manager/Director",
                 pattern: "{controller=Manager/Director}/{action=Index}/{id?}")
+                .WithStaticAssets();
+            app.MapControllerRoute(
+                name: "Authentication",
+                pattern: "{controller=Auth}/{action=Index}/{id?}")
                 .WithStaticAssets();
 
             app.Run();
