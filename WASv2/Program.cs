@@ -49,6 +49,10 @@ namespace WASv2
                 name: "TopManagement",
                 pattern: "{controller=TopManagement}/{action=Index}/{id?}")
                 .WithStaticAssets();
+            app.MapControllerRoute(
+                name: "Manager/Director",
+                pattern: "{controller=Manager/Director}/{action=Index}/{id?}")
+                .WithStaticAssets();
 
             app.Run();
         }

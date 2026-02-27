@@ -1,0 +1,58 @@
+﻿<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3">MANAGER/DIRECTOR</h1>
+    <div class="text-end">
+        <span class="badge bg-primary p-2">Role: Manager/Director</span>
+    </div>
+</div>
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 bg-primary text-white">
+                <div class="card-body">
+                    <h6>Awaiting Director Approval</h6>
+                    <h2 class="display-6">14</h2>
+                    <p class="mb-0 small text-white-50">PRs forwarded by Dept Heads</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 bg-info text-white">
+                <div class="card-body">
+                    <h6>Monthly Dept. Spend</h6>
+                    <h2 class="display-6">₱2.4M</h2>
+                    <p class="mb-0 small text-white-50">Combined across all sections</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Pending Purchase Requisitions</h6>
+        </div>
+        <div class="table-responsive">
+            <table class="table align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>PR Reference</th>
+                        <th>Originating Dept</th>
+                        <th>Purpose</th>
+                        <th>Budget Impact</th>
+                        <th class="text-center">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>PR-2026-105</strong></td>
+                        <td>IT Department</td>
+                        <td>Cybersecurity Software Renewal</td>
+                        <td><span class="text-danger font-weight-bold">High</span></td>
+                        <td class="text-center">
+                            <a asp-action="DirectorPRReview" class="btn btn-sm btn-primary">Open & Approve</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
