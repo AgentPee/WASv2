@@ -4,11 +4,20 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using WASv2.Data;
+using System.Threading.Tasks;
 
 namespace WASv2.Controllers
 {
     public class AuthController : Controller
     {
+        private readonly IMyDbService _myDbService;
+
+        public AuthController(IMyDbService myDbService)
+        {
+            _myDbService = myDbService;
+        }
+        
         public IActionResult Index()
         {
             return View();

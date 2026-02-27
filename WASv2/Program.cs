@@ -1,4 +1,6 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using WASv2.Data;
 
 namespace WASv2
 {
@@ -7,6 +9,13 @@ namespace WASv2
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+            builder.Services.AddDbContext<ApplicationDbContext>(options =>
+            options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+
+            builder.Services.AddScoped<IMyDbService, MyDbService>();
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
