@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
+
 namespace WASv2
 {
     public class Program
@@ -8,6 +10,15 @@ namespace WASv2
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+
+            // Authentication must be registered before building the app
+            builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options =>
+                {
+                    options.LoginPath = "/Auth/SignIn";
+                    //options.LogoutPath = "/Auth/Logout";
+                    options.AccessDeniedPath = "/Auth/AccessDenied";
+                });
 
             var app = builder.Build();
 
@@ -22,6 +33,7 @@ namespace WASv2
             app.UseHttpsRedirection();
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapStaticAssets();
