@@ -7,6 +7,8 @@ using System.Security.Claims;
 using WASv2.Data;
 using System.Threading.Tasks;
 using WASv2.Services;
+using System.Linq;
+
 
 namespace WASv2.Controllers
 {
@@ -41,13 +43,14 @@ namespace WASv2.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = await MyDBService. ValidateUser(model.Email, model.Password);
+                var user = await MyDBService.ValidateUser(model.Email, model.Password);
 
                 if (user != null)
                 {
                     var claims = new List<Claim>
                 {
                     new Claim(ClaimTypes.Email, user.Email),
+                    new Claim(ClaimTypes.Password, user.Password)
                 };
 
                     var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
