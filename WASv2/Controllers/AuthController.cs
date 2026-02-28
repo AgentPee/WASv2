@@ -6,12 +6,19 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using WASv2.Data;
 using System.Threading.Tasks;
+using WASv2.Services;
 
 namespace WASv2.Controllers
 {
     public class AuthController : Controller
     {
         private readonly IMyDbService _myDbService;
+        private object MyDBService;
+        private BinaryReader Name;
+        private BinaryReader Email;
+        private BinaryReader Role;
+        private BinaryReader DeptId;
+        private const string DeptId = "DepartmentId";
 
         public AuthController(IMyDbService myDbService)
         {
@@ -32,18 +39,15 @@ namespace WASv2.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SignIn(LoginViewModel model)
         {
-            if (ModelState.isValid)
+            if (ModelState.IsValid)
             {
-                var user = await MyDBService.ValidateUser(model.Email, model.Password);
+                var user = await MyDBService. ValidateUser(model.Email, model.Password);
 
                 if (user != null)
                 {
                     var claims = new List<Claim>
                 {
-                    new Claim(ClaimTypes.Name, user.FullName),
                     new Claim(ClaimTypes.Email, user.Email),
-                    new Claim(ClaimTypes.Role, user.Role),
-                    new Claim("DepartmentId", user.DeptId.ToString())
                 };
 
                     var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -65,13 +69,18 @@ namespace WASv2.Controllers
             return View(model);
         }
 
-        partial async Task<IActionResult> Logout()
+        public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("Index", "Home");
         }
 
         public IActionResult SignUp()
+        {
+            return View();
+        }
+
+        public IActionResult AccessDenied()
         {
             return View();
         }

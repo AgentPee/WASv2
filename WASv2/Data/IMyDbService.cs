@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using WASv2.Models;
 
 namespace WASv2.Data
 {

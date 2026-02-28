@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using WASv2.Models;
 
 namespace WASv2.Data
 {
