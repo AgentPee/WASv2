@@ -2,7 +2,7 @@
 {
     public static class RoleHelpers
     {
-        // Role ID constants - match these with your AuthController
+        
         public const string PurchasingOfficer = "1";
         public const string DepartmentHead = "2";
         public const string Supplier = "3";

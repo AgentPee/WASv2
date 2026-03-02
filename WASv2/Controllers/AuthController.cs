@@ -7,7 +7,7 @@ using WASv2.Data;
 using System.Threading.Tasks;
 using WASv2.Services;
 using System.Collections.Generic;
-using WASv2.Helpers; // Add this
+using WASv2.Helpers;
 
 namespace WASv2.Controllers
 {
@@ -39,7 +39,6 @@ namespace WASv2.Controllers
                     {
                         new Claim(ClaimTypes.Email, user.Email),
                         new Claim(ClaimTypes.Role, roleId.ToString()),
-                        // Optional: Add role name claim for easier display
                         new Claim("RoleName", RoleHelpers.GetRoleName(roleId))
                     };
 
