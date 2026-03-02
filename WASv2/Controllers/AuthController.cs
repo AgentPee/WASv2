@@ -7,7 +7,7 @@ using WASv2.Data;
 using System.Threading.Tasks;
 using WASv2.Services;
 using System.Collections.Generic;
-using System.Security.Cryptography.X509Certificates;
+
 
 namespace WASv2.Controllers
 {
@@ -38,7 +38,7 @@ namespace WASv2.Controllers
                     var claims = new List<Claim>
                     {
                         new Claim(ClaimTypes.Email, user.Email),
-                        new Claim(ClaimTypes.Role, user.RoleID) 
+                        new Claim(ClaimTypes.Role, user.RoleID.ToString()) 
                     };
 
                     var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
