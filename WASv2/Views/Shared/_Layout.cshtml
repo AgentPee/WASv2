@@ -1,4 +1,6 @@
-﻿﻿
+﻿@using System.Security.Claims
+@using System.Linq
+﻿
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -25,80 +27,120 @@
         </div>
 
         <div class="nav flex-column">
-            <!-- Purchasing Officer Section -->
-            <div class="nav-section-title">Purchasing Officer</div>
-            <a asp-controller="PurchasingOfficer" asp-action="Index" class="nav-link">
-                <i class="fa fa-home me-2"></i> Dashboard
-            </a>
-            <a asp-controller="PurchasingOfficer" asp-action="RFQModule" class="nav-link">
-                <i class="fa fa-tags me-2"></i> RFQ/RFP Module
-            </a>
-            <a asp-controller="PurchasingOfficer" asp-action="PaymentMemo" class="nav-link">
-                <i class="fa fa-money-bill me-2"></i> Payment Memos
-            </a>
+            @if (User.Identity.IsAuthenticated)
+            {
+                var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
 
-            <!-- Department Admin Staff Section -->
-            <div class="nav-section-title">Department Admin Staff</div>
-            <a asp-controller="DepartmentAdminStaff" asp-action="Index" class="nav-link">
-                <i class="fa fa-home me-2"></i> Dashboard
-            </a>
-            <a asp-controller="DepartmentAdminStaff" asp-action="CreatePR" class="nav-link">
-                <i class="fa fa-file-invoice me-2"></i> Purchase Requests
-            </a>
+                <!-- Purchasing Officer Section (Role ID: 3) -->
+                @if (userRole == "1")
+                {
+                    <div class="nav-section-title">Purchasing Officer</div>
+                    <a asp-controller="PurchasingOfficer" asp-action="Index" class="nav-link">
+                        <i class="fa fa-home me-2"></i> Dashboard
+                    </a>
+                    <a asp-controller="PurchasingOfficer" asp-action="RFQModule" class="nav-link">
+                        <i class="fa fa-tags me-2"></i> RFQ/RFP Module
+                    </a>
+                    <a asp-controller="PurchasingOfficer" asp-action="PaymentMemo" class="nav-link">
+                        <i class="fa fa-money-bill me-2"></i> Payment Memos
+                    </a>
+                    <a asp-controller="PurchasingOfficer" asp-action="PurchaseOrder" class="nav-link">
+                        <i class="fa fa-shopping-cart me-2"></i> Purchase Orders
+                    </a>
+                    <a asp-controller="PurchasingOfficer" asp-action="Accreditation" class="nav-link">
+                        <i class="fa fa-user-check me-2"></i> Accreditation
+                    </a>
+                    <a asp-controller="PurchasingOfficer" asp-action="Delivery" class="nav-link">
+                        <i class="fa fa-truck me-2"></i> Delivery/Receiving
+                    </a>
+                }
 
-            <!-- Procurement Section -->
-            <div class="nav-section-title">Procurement</div>
-            <a asp-controller="PurchasingOfficer" asp-action="PurchaseOrder" class="nav-link">
-                <i class="fa fa-shopping-cart me-2"></i> Purchase Orders
-            </a>
+                <!-- Department Admin Staff Section (Role ID: 4 - Assuming this is the role ID) -->
+                @if (userRole == "")
+                {
+                    <div class="nav-section-title">Department Admin Staff</div>
+                    <a asp-controller="DepartmentAdminStaff" asp-action="Index" class="nav-link">
+                        <i class="fa fa-home me-2"></i> Dashboard
+                    </a>
+                    <a asp-controller="DepartmentAdminStaff" asp-action="CreatePR" class="nav-link">
+                        <i class="fa fa-file-invoice me-2"></i> Purchase Requests
+                    </a>
+                }
 
-            <!-- Vendors Section -->
-            <div class="nav-section-title">Vendors</div>
-            <a asp-controller="PurchasingOfficer" asp-action="Accreditation" class="nav-link">
-                <i class="fa fa-user-check me-2"></i> Accreditation
-            </a>
-            <a asp-controller="PurchasingOfficer" asp-action="Delivery" class="nav-link">
-                <i class="fa fa-truck me-2"></i> Delivery/Receiving
-            </a>
+                <!-- Department Head Section (Role ID: 2) -->
+                @if (userRole == "2")
+                {
+                    <div class="nav-section-title">Department Head</div>
+                    <a asp-controller="DepartmentHead" asp-action="Index" class="nav-link">
+                        <i class="fa fa-home me-2"></i> Dashboard
+                    </a>
+                    <a asp-controller="DepartmentHead" asp-action="PaymentMemoReview" class="nav-link">
+                        <i class="fa fa-money-bill me-2"></i> Payment Request Memo Review
+                    </a>
+                    <a asp-controller="DepartmentHead" asp-action="CARating" class="nav-link">
+                        <i class="fa fa-file-invoice me-2"></i> Certificate of Acceptance Rating
+                    </a>
+                }
 
-            <!-- Department Head Section -->
-            <div class="nav-section-title">Department Head</div>
-            <a asp-controller="DepartmentHead" asp-action="Index" class="nav-link">
-                <i class="fa fa-home me-2"></i> Dashboard
-            </a>
-            <a asp-controller="DepartmentHead" asp-action="PaymentMemoReview" class="nav-link">
-                <i class="fa fa-money-bill me-2"></i> Payment Request Memo Review
-            </a>
-            <a asp-controller="DepartmentHead" asp-action="CARating" class="nav-link">
-                <i class="fa fa-file-invoice me-2"></i> Certificate of Acceptance Rating
-            </a>
+                <!-- Supplier Section (Role ID: 1) -->
+                @if (userRole == "")
+                {
+                    <div class="nav-section-title">Supplier</div>
+                    <a asp-controller="Supplier" asp-action="Index" class="nav-link">
+                        <i class="fa fa-home me-2"></i> Dashboard
+                    </a>
+                }
 
-            <!-- Supplier Section -->
-            <div class="nav-section-title">Supplier</div>
-            <a asp-controller="Supplier" asp-action="Index" class="nav-link">
-                <i class="fa fa-home me-2"></i> Dashboard
-            </a>
+                <!-- PAM Staff Section (Role ID: 5) -->
+                @if (userRole == "")
+                {
+                    <div class="nav-section-title">PAM Staff</div>
+                    <a asp-controller="PamStaff" asp-action="Index" class="nav-link">
+                        <i class="fa fa-home me-2"></i> Dashboard
+                    </a>
+                }
 
-            <!-- PAM Staff Section -->
-            <div class="nav-section-title">PAM Staff</div>
-            <a asp-controller="PamStaff" asp-action="Index" class="nav-link">
-                <i class="fa fa-home me-2"></i> Dashboard
-            </a>
+                <!-- Top Management Section (Role ID: 6) -->
+                @if (userRole == "")
+                {
+                    <div class="nav-section-title">Top Management</div>
+                    <a asp-controller="TopManagement" asp-action="Index" class="nav-link">
+                        <i class="fa fa-home me-2"></i> Dashboard
+                    </a>
+                }
 
-            <!-- Top Management Section -->
-            <div class="nav-section-title">Top Management</div>
-            <a asp-controller="TopManagement" asp-action="Index" class="nav-link">
-                <i class="fa fa-home me-2"></i> Dashboard
-            </a>
+                <!-- Manager/Director Section (Role ID: 7) -->
+                @if (userRole == "")
+                {
+                    <div class="nav-section-title">Manager/Director</div>
+                    <a asp-controller="ManagerDirector" asp-action="Index" class="nav-link">
+                        <i class="fa fa-home me-2"></i> Dashboard
+                    </a>
+                    <a asp-controller="ManagerDirector" asp-action="DirectorPReview" class="nav-link">
+                        <i class="fa fa-file-invoice me-2"></i> Review PR
+                    </a>
+                }
 
-            <!-- Manager/Director Section -->
-            <div class="nav-section-title">Manager/Director</div>
-            <a asp-controller="ManagerDirector" asp-action="Index" class="nav-link">
-                <i class="fa fa-home me-2"></i> Dashboard
-            </a>
-            <a asp-controller="ManagerDirector" asp-action="DirectorPReview" class="nav-link">
-                <i class="fa fa-file-invoice me-2"></i> Review PR
-            </a>
+                <!-- If user has multiple roles or admin role -->
+                @if (userRole == "Admin" || userRole == "0")
+                {
+                    <!-- Show all sections for admin -->
+                    <div class="nav-section-title">Purchasing Officer</div>
+                    <a asp-controller="PurchasingOfficer" asp-action="Index" class="nav-link">Dashboard</a>
+                    <!-- Add all other sections... -->
+                }
+            }
+            else
+            {
+                <!-- Optional: Show limited menu for non-authenticated users -->
+                <div class="nav-section-title">Welcome</div>
+                <a asp-controller="Home" asp-action="Index" class="nav-link">
+                    <i class="fa fa-home me-2"></i> Home
+                </a>
+                <a asp-controller="Auth" asp-action="SignIn" class="nav-link">
+                    <i class="fa fa-sign-in-alt me-2"></i> Sign In
+                </a>
+            }
         </div>
     </nav>
 
@@ -111,6 +153,21 @@
                 {
                     <span class="user-name">
                         <i class="fa fa-user-circle me-2"></i>@User.Identity.Name
+                        @{
+                            var role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+                            var roleName = role switch
+                            {
+                                            "1" => "(Purchasing Officer)",
+                                            "2" => "(Department Head)",
+                                            "3" => "()",
+                                            "4" => "()",
+                                            "5" => "()",
+                                            "6" => "()",
+                                            "7" => "()",
+                                _ => ""
+                            };
+                        }
+                        <small class="text-muted ms-2">@roleName</small>
                     </span>
                     <a asp-controller="Auth" asp-action="Logout" class="logout-btn" onclick="return confirmLogout();">
                         <i class="fa fa-sign-out-alt"></i> Logout
