@@ -7,14 +7,13 @@ using WASv2.Data;
 using System.Threading.Tasks;
 using WASv2.Services;
 using System.Collections.Generic;
-
+using WASv2.Helpers;
 
 namespace WASv2.Controllers
 {
     public class AuthController : Controller
     {
         private readonly IMyDbService _myDbService;
-        
 
         public AuthController(IMyDbService myDbService)
         {
@@ -30,15 +29,17 @@ namespace WASv2.Controllers
         {
             if (ModelState.IsValid)
             {
-                
                 var user = await _myDbService.ValidateUser(model.Email, model.PasswordHash);
 
                 if (user != null)
                 {
+                    int roleId = user.RoleID ?? 0;
+
                     var claims = new List<Claim>
                     {
                         new Claim(ClaimTypes.Email, user.Email),
-                        new Claim(ClaimTypes.Role, user.RoleID.ToString()) 
+                        new Claim(ClaimTypes.Role, roleId.ToString()),
+                        new Claim("RoleName", RoleHelpers.GetRoleName(roleId))
                     };
 
                     var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -46,14 +47,9 @@ namespace WASv2.Controllers
                     await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
                         new ClaimsPrincipal(claimsIdentity));
 
-                    
-                    return user.RoleID switch
-                    {
-                        3 => RedirectToAction("Index", "Supplier"),
-                        2 => RedirectToAction("Index", "DepartmentHead"),
-                        1 => RedirectToAction("Index", "PurchasingOfficer"),
-                        _ => RedirectToAction("Index", "Home")
-                    };
+                    // Use RoleHelpers to determine redirect
+                    var controllerName = RoleHelpers.GetDashboardController(roleId);
+                    return RedirectToAction("Index", controllerName);
                 }
                 ModelState.AddModelError("", "Invalid Login Attempt.");
             }
