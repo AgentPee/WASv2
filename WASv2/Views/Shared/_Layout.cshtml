@@ -1,64 +1,150 @@
-﻿<!DOCTYPE html>
+﻿﻿
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>W-AS - Workflow & Archiving</title>
+
+    <!-- External CSS -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
-    <style>
-        body { display: flex; min-height: 100vh; background: #f8f9fa; }
-        #sidebar { min-width: 250px; max-width: 250px; background: #343a40; color: white; }
-        #content { flex: 1; padding: 20px; }
-        .nav-link { color: rgba(255,255,255,.8); border-radius: 0; }
-        .nav-link:hover { background: #495057; color: white; }
-        .nav-link.active { background: #0d6efd; color: white; }
-    </style>
+
+    <!-- Custom Site CSS -->
+    <link rel="stylesheet" href="~/css/_layout.css" asp-append-version="true" />
+
+    <!-- Optional: Add page-specific styles -->
+    @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
-    <nav id="sidebar" class="d-flex flex-column p-3">
-        <h4 class="text-center mb-4">W-AS</h4>
-        <ul class="nav nav-pills flex-column mb-auto">
-            <li class="mt-3 small text-uppercase px-3">Purchasing Officer</li>
-            <li><a asp-controller="PurchasingOfficer" asp-action="Index" class="nav-link active"><i class="fa fa-home me-2"></i> Dashboard</a></li>
-            <li><a asp-controller="PurchasingOfficer" asp-action="RFQModule" class="nav-link"><i class="fa fa-tags me-2"></i> RFQ/RFP Module</a></li>
-            <li><a asp-controller="PurchasingOfficer" asp-action="PaymentMemo" class="nav-link"><i class="fa fa-money-bill me-2"></i> Payment Memos</a></li>
+    <!-- Sidebar (Left Navigation) -->
+    <nav id="sidebar" class="d-flex flex-column">
+        <div class="sidebar-header text-center">
+            <h4 class="mb-1">W-AS</h4>
+            <small>Workflow & Archiving</small>
+        </div>
 
-            <li class="mt-3 small text-uppercase px-3">Department Admin Staff</li>
-            <li><a asp-controller="DepartmentAdminStaff" asp-action="Index" class="nav-link active"><i class="fa fa-home me-2"></i> DashBoard </a></li>
-            <li><a asp-controller="DepartmentAdminStaff" asp-action="CreatePR" class="nav-link"><i class="fa fa-file-invoice me-2"></i> Purchase Requests</a></li>
+        <div class="nav flex-column">
+            <!-- Purchasing Officer Section -->
+            <div class="nav-section-title">Purchasing Officer</div>
+            <a asp-controller="PurchasingOfficer" asp-action="Index" class="nav-link">
+                <i class="fa fa-home me-2"></i> Dashboard
+            </a>
+            <a asp-controller="PurchasingOfficer" asp-action="RFQModule" class="nav-link">
+                <i class="fa fa-tags me-2"></i> RFQ/RFP Module
+            </a>
+            <a asp-controller="PurchasingOfficer" asp-action="PaymentMemo" class="nav-link">
+                <i class="fa fa-money-bill me-2"></i> Payment Memos
+            </a>
 
-            <li class="mt-3 small text-uppercase px-3">Procurement</li>
-            
-            <li><a asp-controller="PurchasingOfficer" asp-action="PurchaseOrder" class="nav-link"><i class="fa fa-shopping-cart me-2"></i> Purchase Orders</a></li>
+            <!-- Department Admin Staff Section -->
+            <div class="nav-section-title">Department Admin Staff</div>
+            <a asp-controller="DepartmentAdminStaff" asp-action="Index" class="nav-link">
+                <i class="fa fa-home me-2"></i> Dashboard
+            </a>
+            <a asp-controller="DepartmentAdminStaff" asp-action="CreatePR" class="nav-link">
+                <i class="fa fa-file-invoice me-2"></i> Purchase Requests
+            </a>
 
-            <li class="mt-3 small text-uppercase px-3">Vendors</li>
-            <li><a asp-controller="PurchasingOfficer" asp-action="Accreditation" class="nav-link"><i class="fa fa-user-check me-2"></i> Accreditation </a></li>
-            <li><a asp-controller="PurchasingOfficer" asp-action="Delivery" class="nav-link"><i class="fa fa-truck me-2"></i> Delivery/Receiving</a></li>
+            <!-- Procurement Section -->
+            <div class="nav-section-title">Procurement</div>
+            <a asp-controller="PurchasingOfficer" asp-action="PurchaseOrder" class="nav-link">
+                <i class="fa fa-shopping-cart me-2"></i> Purchase Orders
+            </a>
 
-            <li class="mt-3 small text-uppercase px-3">Department Head</li>
-            <li><a asp-controller="DepartmentHead" asp-action="Index" class="nav-link active"><i class="fa fa-home me-2"></i> Dashboard</a></li>
-            <li><a asp-controller="DepartmentHead" asp-action="PaymentMemoReview" class="nav-link"><i class="fa fa-money-bill me-2"></i> Payment Request Memo Review </a></li>
-            <li><a asp-controller="DepartmentHead" asp-action="CARating" class="nav-link"><i class="fa fa-file-invoice me-2"></i> Certificate of Acceptance Rating </a></li>
+            <!-- Vendors Section -->
+            <div class="nav-section-title">Vendors</div>
+            <a asp-controller="PurchasingOfficer" asp-action="Accreditation" class="nav-link">
+                <i class="fa fa-user-check me-2"></i> Accreditation
+            </a>
+            <a asp-controller="PurchasingOfficer" asp-action="Delivery" class="nav-link">
+                <i class="fa fa-truck me-2"></i> Delivery/Receiving
+            </a>
 
-            <li class="mt-3 small text-uppercase px-3">Supplier</li>
-            <li><a asp-controller="Supplier" asp-action="Index" class="nav-link active"><i class="fa fa-home me-2"></i> Dashboard</a></li>
+            <!-- Department Head Section -->
+            <div class="nav-section-title">Department Head</div>
+            <a asp-controller="DepartmentHead" asp-action="Index" class="nav-link">
+                <i class="fa fa-home me-2"></i> Dashboard
+            </a>
+            <a asp-controller="DepartmentHead" asp-action="PaymentMemoReview" class="nav-link">
+                <i class="fa fa-money-bill me-2"></i> Payment Request Memo Review
+            </a>
+            <a asp-controller="DepartmentHead" asp-action="CARating" class="nav-link">
+                <i class="fa fa-file-invoice me-2"></i> Certificate of Acceptance Rating
+            </a>
 
-            <li class="mt-3 small text-uppercase px-3">PAM Staff</li>
-            <li><a asp-controller="PamStaff" asp-action="Index" class="nav-link active"><i class="fa fa-home me-2"></i> Dashboard</a></li>
+            <!-- Supplier Section -->
+            <div class="nav-section-title">Supplier</div>
+            <a asp-controller="Supplier" asp-action="Index" class="nav-link">
+                <i class="fa fa-home me-2"></i> Dashboard
+            </a>
 
-            <li class="mt-3 small text-uppercase px-3">Top Management</li>
-            <li><a asp-controller="TopManagement" asp-action="Index" class="nav-link active"><i class="fa fa-home me-2"></i> Dashboard</a></li>
+            <!-- PAM Staff Section -->
+            <div class="nav-section-title">PAM Staff</div>
+            <a asp-controller="PamStaff" asp-action="Index" class="nav-link">
+                <i class="fa fa-home me-2"></i> Dashboard
+            </a>
 
-            <li class="mt-3 small text-uppercase px-3">Manager/Director</li>
-            <li><a asp-controller="ManagerDirector" asp-action="Index" class="nav-link active"><i class="fa fa-home me-2"></i> Dashboard</a></li>
-            <li><a asp-controller="ManagerDirector" asp-action="DirectorPReview" class="nav-link"><i class="fa fa-file-invoice me-2"></i> Review PR</a></li>
-        </ul>
+            <!-- Top Management Section -->
+            <div class="nav-section-title">Top Management</div>
+            <a asp-controller="TopManagement" asp-action="Index" class="nav-link">
+                <i class="fa fa-home me-2"></i> Dashboard
+            </a>
+
+            <!-- Manager/Director Section -->
+            <div class="nav-section-title">Manager/Director</div>
+            <a asp-controller="ManagerDirector" asp-action="Index" class="nav-link">
+                <i class="fa fa-home me-2"></i> Dashboard
+            </a>
+            <a asp-controller="ManagerDirector" asp-action="DirectorPReview" class="nav-link">
+                <i class="fa fa-file-invoice me-2"></i> Review PR
+            </a>
+        </div>
     </nav>
 
-    <main id="content">
-        
-        @RenderBody()
-    </main>
+    <!-- Main Content Area with Top Navbar -->
+    <div id="content">
+        <!-- Top Navbar with Logout -->
+        <nav id="top-navbar">
+            <div class="user-info">
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <span class="user-name">
+                        <i class="fa fa-user-circle me-2"></i>@User.Identity.Name
+                    </span>
+                    <a asp-controller="Auth" asp-action="Logout" class="logout-btn" onclick="return confirmLogout();">
+                        <i class="fa fa-sign-out-alt"></i> Logout
+                    </a>
+                }
+                else
+                {
+                    <a asp-controller="Auth" asp-action="SignIn" class="login-btn">
+                        <i class="fa fa-sign-in-alt me-2"></i>Sign In
+                    </a>
+                }
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main id="main-content">
+            @RenderBody()
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            &copy; @DateTime.Now.Year - W-AS (Workflow & Archiving System). All rights reserved.
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <!-- External Scripts -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom Site Script -->
+    <script src="~/js/_layout.js" asp-append-version="true"></script>
+
+    <!-- Page Specific Scripts -->
+    @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

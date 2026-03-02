@@ -1,0 +1,174 @@
+﻿/* wwwroot/css/site.css */
+
+/* Layout Styles */
+body {
+    display: flex;
+    min-height: 100vh;
+    background: #f8f9fa;
+    margin: 0;
+    padding: 0;
+}
+
+/* Sidebar Styles */
+#sidebar {
+    min-width: 250px;
+    max-width: 250px;
+    background: #343a40;
+    color: white;
+    height: 100vh;
+    position: fixed;
+    overflow-y: auto;
+}
+
+.sidebar-header {
+    padding: 1.5rem 1rem;
+    border-bottom: 1px solid #495057;
+    margin-bottom: 1rem;
+}
+
+    .sidebar-header h4 {
+        margin-bottom: 0.25rem;
+    }
+
+    .sidebar-header small {
+        color: rgba(255,255,255,0.5);
+    }
+
+/* Navigation Links */
+.nav-link {
+    color: rgba(255,255,255,.8);
+    border-radius: 0;
+    padding: 0.8rem 1rem;
+    transition: all 0.3s;
+}
+
+    .nav-link:hover {
+        background: #495057;
+        color: white;
+        padding-left: 1.5rem;
+    }
+
+    .nav-link.active {
+        background: #0d6efd;
+        color: white;
+    }
+
+.nav-section-title {
+    color: #6c757d;
+    font-size: 0.75rem;
+    padding: 0.5rem 1rem;
+    margin-top: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Main Content Area */
+#content {
+    flex: 1;
+    margin-left: 250px;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Top Navbar Styles */
+#top-navbar {
+    background: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,.1);
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.user-name {
+    font-weight: 500;
+    color: #333;
+}
+
+    .user-name i {
+        color: #6c757d;
+    }
+
+/* Button Styles */
+.logout-btn {
+    color: #dc3545;
+    border: 1px solid #dc3545;
+    padding: 0.5rem 1.5rem;
+    border-radius: 5px;
+    transition: all 0.3s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: transparent;
+}
+
+    .logout-btn:hover {
+        background: #dc3545;
+        color: white;
+    }
+
+.login-btn {
+    background: #0d6efd;
+    color: white;
+    padding: 0.5rem 1.5rem;
+    border-radius: 5px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: none;
+    transition: all 0.3s;
+}
+
+    .login-btn:hover {
+        background: #0b5ed7;
+        color: white;
+    }
+
+/* Main Content Area */
+#main-content {
+    padding: 2rem;
+    flex: 1;
+    background: #f8f9fa;
+}
+
+/* Footer Styles */
+.footer {
+    text-align: center;
+    padding: 1rem;
+    color: #6c757d;
+    border-top: 1px solid #dee2e6;
+    margin-top: auto;
+    background: white;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    #sidebar {
+        min-width: 100%;
+        max-width: 100%;
+        position: relative;
+        height: auto;
+    }
+
+    #content {
+        margin-left: 0;
+    }
+
+    #top-navbar {
+        padding: 1rem;
+    }
+
+    .user-info {
+        flex-direction: column;
+        align-items: flex-end;
+    }
+}
