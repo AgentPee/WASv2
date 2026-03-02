@@ -4,8 +4,8 @@
     {
         
         public const string PurchasingOfficer = "1";
-        public const string DepartmentHead = "2";
-        public const string Supplier = "3";
+        public const string Supplier = "2";
+        public const string DepartmentHead = "3";
         public const string DepartmentAdminStaff = "4";
         public const string PamStaff = "5";
         public const string TopManagement = "6";
@@ -51,8 +51,8 @@
             return roleId switch
             {
                 1 => "PurchasingOfficer",
-                2 => "DepartmentHead",
-                3 => "Supplier",
+                2 => "Supplier",
+                3 => "DepartmentHead",
                 4 => "DepartmentAdminStaff",
                 5 => "PamStaff",
                 6 => "TopManagement",
