@@ -49,9 +49,9 @@ namespace WASv2.Controllers
                     
                     return user.RoleID switch
                     {
-                        1 => RedirectToAction("Index", "Supplier"),
+                        3 => RedirectToAction("Index", "Supplier"),
                         2 => RedirectToAction("Index", "DepartmentHead"),
-                        3 => RedirectToAction("Index", "PurchasingOfficer"),
+                        1 => RedirectToAction("Index", "PurchasingOfficer"),
                         _ => RedirectToAction("Index", "Home")
                     };
                 }
