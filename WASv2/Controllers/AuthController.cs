@@ -2,40 +2,27 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using WASv2.Data;
 using System.Threading.Tasks;
 using WASv2.Services;
-using System.Linq;
-
+using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 
 namespace WASv2.Controllers
 {
     public class AuthController : Controller
     {
         private readonly IMyDbService _myDbService;
-        private object MyDBService;
-        private BinaryReader Name;
-        private BinaryReader Email;
-        private BinaryReader Role;
-        private BinaryReader DeptId;
-        private const string DeptId = "DepartmentId";
+        
 
         public AuthController(IMyDbService myDbService)
         {
             _myDbService = myDbService;
         }
-        
-        public IActionResult Index()
-        {
-            return View();
-        }
 
-        public IActionResult SignIn()
-        {
-            return View();
-        }
+        public IActionResult Index() => View();
+        public IActionResult SignIn() => View();
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -43,28 +30,29 @@ namespace WASv2.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = await MyDBService.ValidateUser(model.Email, model.Password);
+                
+                var user = await _myDbService.ValidateUser(model.Email, model.PasswordHash);
 
                 if (user != null)
                 {
                     var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Email, user.Email),
-                    new Claim(ClaimTypes.Password, user.Password)
-                };
+                    {
+                        new Claim(ClaimTypes.Email, user.Email),
+                        new Claim(ClaimTypes.Role, user.RoleID) 
+                    };
 
                     var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
                     await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
                         new ClaimsPrincipal(claimsIdentity));
 
-                    //Role-Based Redirection
-                    return user.RoleName switch
+                    
+                    return user.RoleID switch
                     {
-                        "Supplier" => RedirectToAction("", ""),
-                        "DeptHead" => RedirectToAction("", ""),
-                        "Purchasing" => RedirectToAction("", ""),
-                        _ => RedirectToAction("", "")
+                        1 => RedirectToAction("Index", "Supplier"),
+                        2 => RedirectToAction("Index", "DepartmentHead"),
+                        3 => RedirectToAction("Index", "PurchasingOfficer"),
+                        _ => RedirectToAction("Index", "Home")
                     };
                 }
                 ModelState.AddModelError("", "Invalid Login Attempt.");
@@ -78,15 +66,8 @@ namespace WASv2.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        public IActionResult SignUp()
-        {
-            return View();
-        }
-
-        public IActionResult AccessDenied()
-        {
-            return View();
-        }
+        public IActionResult SignUp() => View();
+        public IActionResult AccessDenied() => View();
     }
 
     public class LoginViewModel
@@ -95,7 +76,7 @@ namespace WASv2.Controllers
         public string Email { get; set; }
 
         [Required, DataType(DataType.Password)]
-        public string Password { get; set; }
+        public string PasswordHash { get; set; }
 
         public bool RememberMe { get; set; }
     }

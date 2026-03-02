@@ -11,7 +11,7 @@ namespace WASv2.Data
 
         public async Task<User?> ValidateUser(string email, string password)
         {
-            return await _db.Users.SingleOrDefaultAsync(u => u.Email == email && u.Password == password);
+            return await _db.Users.SingleOrDefaultAsync(u => u.Email == email && u.PasswordHash == password);
         }
     }
 }

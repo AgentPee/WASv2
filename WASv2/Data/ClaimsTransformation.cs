@@ -19,16 +19,23 @@ namespace WASv2.Services
         {
             if (principal.Identity is ClaimsIdentity identity)
             {
+                // FIX: Define emailClaim before using it
                 var emailClaim = identity.FindFirst(ClaimTypes.Email);
+
                 if (emailClaim != null)
                 {
-                    var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == emailClaim.Value);
+                    // Fetch user and include the Role object to get the RoleName
+                    var user = await _context.Users
+                        .Include(u => u.Role)
+                        .FirstOrDefaultAsync(u => u.Email == emailClaim.Value);
+
                     if (user != null)
                     {
-                        // Add role claim
-                        identity.AddClaim(new Claim(ClaimTypes.Role, user.Role));
-                        // Add department claim
-                        identity.AddClaim(new Claim("DepartmentId", user.DeptId.ToString()));
+                        // Add role claim using the helper property
+                        identity.AddClaim(new Claim(ClaimTypes.Role, user.RoleName));
+
+                        // FIX: Use DeptID (matching your User.cs)
+                        identity.AddClaim(new Claim("DepartmentId", user.DeptID?.ToString() ?? "0"));
                     }
                 }
             }
