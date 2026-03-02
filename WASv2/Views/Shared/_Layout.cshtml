@@ -8,18 +8,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>W-AS - Workflow & Archiving</title>
 
-    <!-- External CSS -->
+    
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 
-    <!-- Custom Site CSS -->
+    
     <link rel="stylesheet" href="~/css/_layout.css" asp-append-version="true" />
 
-    <!-- Optional: Add page-specific styles -->
+    
     @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
-    <!-- Sidebar (Left Navigation) -->
+    
     <nav id="sidebar" class="d-flex flex-column">
         <div class="sidebar-header text-center">
             <h4 class="mb-1">W-AS</h4>
@@ -31,7 +31,7 @@
             {
                 var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
 
-                <!-- Purchasing Officer Section (Role ID: 3) -->
+                <!-- Purchasing Officer Section (Role ID: 1) -->
                 @if (userRole == "1")
                 {
                     <div class="nav-section-title">Purchasing Officer</div>
@@ -55,7 +55,7 @@
                     </a>
                 }
 
-                <!-- Department Admin Staff Section (Role ID: 4 - Assuming this is the role ID) -->
+                <!-- Department Admin Staff Section (Role ID: ) -->
                 @if (userRole == "")
                 {
                     <div class="nav-section-title">Department Admin Staff</div>
@@ -82,7 +82,7 @@
                     </a>
                 }
 
-                <!-- Supplier Section (Role ID: 1) -->
+                <!-- Supplier Section (Role ID: ) -->
                 @if (userRole == "")
                 {
                     <div class="nav-section-title">Supplier</div>
@@ -91,7 +91,7 @@
                     </a>
                 }
 
-                <!-- PAM Staff Section (Role ID: 5) -->
+                <!-- PAM Staff Section (Role ID: ) -->
                 @if (userRole == "")
                 {
                     <div class="nav-section-title">PAM Staff</div>
@@ -100,7 +100,7 @@
                     </a>
                 }
 
-                <!-- Top Management Section (Role ID: 6) -->
+                <!-- Top Management Section (Role ID: ) -->
                 @if (userRole == "")
                 {
                     <div class="nav-section-title">Top Management</div>
@@ -109,7 +109,7 @@
                     </a>
                 }
 
-                <!-- Manager/Director Section (Role ID: 7) -->
+                <!-- Manager/Director Section (Role ID: ) -->
                 @if (userRole == "")
                 {
                     <div class="nav-section-title">Manager/Director</div>
@@ -132,7 +132,7 @@
             }
             else
             {
-                <!-- Optional: Show limited menu for non-authenticated users -->
+                <!-- limited menu for non-authenticated users -->
                 <div class="nav-section-title">Welcome</div>
                 <a asp-controller="Home" asp-action="Index" class="nav-link">
                     <i class="fa fa-home me-2"></i> Home
@@ -144,9 +144,9 @@
         </div>
     </nav>
 
-    <!-- Main Content Area with Top Navbar -->
+    
     <div id="content">
-        <!-- Top Navbar with Logout -->
+        
         <nav id="top-navbar">
             <div class="user-info">
                 @if (User.Identity.IsAuthenticated)
@@ -182,26 +182,25 @@
             </div>
         </nav>
 
-        <!-- Main Content -->
+        
         <main id="main-content">
             @RenderBody()
         </main>
 
-        <!-- Footer -->
+        
         <footer class="footer">
             &copy; @DateTime.Now.Year - W-AS (Workflow & Archiving System). All rights reserved.
         </footer>
     </div>
 
-    <!-- Scripts -->
-    <!-- External Scripts -->
+    
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Custom Site Script -->
+    
     <script src="~/js/_layout.js" asp-append-version="true"></script>
 
-    <!-- Page Specific Scripts -->
+    
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
