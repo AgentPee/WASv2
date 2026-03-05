@@ -1,51 +1,267 @@
-﻿<div class="container-fluid">
+﻿@model WASv2.Controllers.PRFViewModel
+
+@{
+    ViewData["Title"] = "Department Admin Staff - PRF Management";
+}
+
+<div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3">Department Admin Staff</h1>
+        <h1 class="h3">Department Admin Staff - PRF Management</h1>
         <div class="text-end">
             <span class="badge bg-primary p-2">Role: Dept Admin Staff - IT</span>
         </div>
     </div>
 
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
     <div class="row">
         <div class="col-md-8">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white">Initiate New Purchase Request</div>
+            <!-- PR Number Search Card -->
+            <div class="card shadow mb-4">
+                <div class="card-header bg-primary text-white">
+                    <i class="fa fa-search me-2"></i>Search PRF by PR Number
+                </div>
                 <div class="card-body">
-                    <form>
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label class="form-label">PR Number</label>
-                                <input type="text" class="form-control" placeholder="Manual/System Generated">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Budget Confirmation</label>
-                                <select class="form-select">
-                                    <option>Confirmed (Stock Replenishment)</option>
-                                    <option>Subject for Approval</option>
-                                </select>
-                            </div>
+                    <form asp-action="SearchPR" method="post" id="searchForm">
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control form-control-lg"
+                                   asp-for="PRNumber"
+                                   placeholder="Enter PR Number (e.g., PR-2026-001)" />
+                            <button class="btn btn-primary" type="submit">
+                                <i class="fa fa-search me-2"></i>Search
+                            </button>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Upload PRF (Scanned/PDF)</label>
-                            <input type="file" class="form-control">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Remarks/Reason</label>
-                            <textarea class="form-control" rows="3"></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100">Submit to Dept Head</button>
+                        <span asp-validation-for="PRNumber" class="text-danger"></span>
                     </form>
                 </div>
             </div>
+
+            @if (Model.IsSearched)
+            {
+                if (Model.IsFound)
+                {
+                    <!-- PRF Details Card -->
+                    <div class="card shadow mb-4">
+                        <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                            <span><i class="fa fa-file-invoice me-2"></i>PRF Details - @Model.PRNumber</span>
+                            @if (!string.IsNullOrEmpty(Model.PRFFileName))
+                            {
+                                <a href="#" class="btn btn-sm btn-light">
+                                    <i class="fa fa-download me-1"></i>Download PRF
+                                </a>
+                            }
+                        </div>
+                        <div class="card-body">
+                            <form asp-action="SubmitToDeptHead" method="post">
+                                <input type="hidden" asp-for="PRNumber" />
+                                <input type="hidden" asp-for="Department" />
+                                <input type="hidden" asp-for="RequestDate" />
+                                <input type="hidden" asp-for="RequestedBy" />
+                                <input type="hidden" asp-for="Purpose" />
+                                <input type="hidden" asp-for="BudgetLine" />
+                                <input type="hidden" asp-for="TotalAmount" />
+                                <input type="hidden" asp-for="PRFFileName" />
+
+                                <!-- PRF Information -->
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Department</label>
+                                            <p class="form-control-plaintext">@Model.Department</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Request Date</label>
+                                            <p class="form-control-plaintext">@Model.RequestDate.ToString("MMM dd, yyyy")</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Requested By</label>
+                                            <p class="form-control-plaintext">@Model.RequestedBy</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Budget Line</label>
+                                            <p class="form-control-plaintext">@Model.BudgetLine</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Purpose</label>
+                                    <p class="form-control-plaintext">@Model.Purpose</p>
+                                </div>
+
+                                <!-- Items Table -->
+                                @if (Model.Items != null && Model.Items.Any())
+                                {
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Items</label>
+                                        <div class="table-responsive">
+                                            <table class="table table-sm table-bordered">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th>Item No.</th>
+                                                        <th>Description</th>
+                                                        <th>Qty</th>
+                                                        <th>Unit</th>
+                                                        <th>Unit Price</th>
+                                                        <th>Total</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach (var item in Model.Items)
+                                                    {
+                                                        <tr>
+                                                            <td>@item.ItemNo</td>
+                                                            <td>@item.Description</td>
+                                                            <td>@item.Quantity</td>
+                                                            <td>@item.Unit</td>
+                                                            <td>@item.UnitPrice.ToString("C2")</td>
+                                                            <td>@item.TotalPrice.ToString("C2")</td>
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                                <tfoot class="table-secondary">
+                                                    <tr>
+                                                        <td colspan="5" class="text-end fw-bold">Total Amount:</td>
+                                                        <td class="fw-bold">@Model.TotalAmount.ToString("C2")</td>
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
+                                        </div>
+                                    </div>
+                                }
+
+                                <!-- Budget Confirmation -->
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Budget Confirmation</label>
+                                        <select class="form-select" asp-for="BudgetConfirmation">
+                                            <option>Confirmed (Stock Replenishment)</option>
+                                            <option>Subject for Approval</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- Upload PRF -->
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Upload PRF (Scanned/PDF)</label>
+                                    <input type="file" class="form-control" name="prfFile" accept=".pdf,.jpg,.jpeg,.png" />
+                                    <small class="text-muted">Upload new file or use existing: @Model.PRFFileName</small>
+                                </div>
+
+                                <!-- Remarks -->
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Remarks/Reason</label>
+                                    <textarea class="form-control" asp-for="Remarks" rows="3"></textarea>
+                                </div>
+
+                                <!-- Submit Button -->
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fa fa-paper-plane me-2"></i>Submit to Department Head
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-warning">
+                        <i class="fa fa-exclamation-triangle me-2"></i>
+                        PR Number "@Model.PRNumber" not found. Please check the number and try again.
+                    </div>
+                }
+            }
         </div>
+
+        <!-- Recent Activity Sidebar -->
         <div class="col-md-4">
             <div class="card shadow">
-                <div class="card-header">Recent Activity</div>
-                <ul class="list-group list-group-flush small">
-                    <li class="list-group-item text-success">PR-2026-001 Approved by Head</li>
-                    <li class="list-group-item text-danger">PR-2026-002 Disapproved: Missing specs</li>
+                <div class="card-header bg-secondary text-white">
+                    <i class="fa fa-history me-2"></i>Recent Activity
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="text-success"><i class="fa fa-check-circle me-2"></i>PR-2026-001</span>
+                            <br />
+                            <small class="text-muted">Approved by Head - 2 hours ago</small>
+                        </div>
+                        <span class="badge bg-success">Approved</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="text-danger"><i class="fa fa-times-circle me-2"></i>PR-2026-002</span>
+                            <br />
+                            <small class="text-muted">Disapproved: Missing specs - Yesterday</small>
+                        </div>
+                        <span class="badge bg-danger">Rejected</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="text-warning"><i class="fa fa-clock me-2"></i>PR-2026-003</span>
+                            <br />
+                            <small class="text-muted">Pending Head Approval - 3 days ago</small>
+                        </div>
+                        <span class="badge bg-warning">Pending</span>
+                    </li>
                 </ul>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="card shadow mt-4">
+                <div class="card-header bg-info text-white">
+                    <i class="fa fa-chart-bar me-2"></i>Quick Stats
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Pending PRs:</span>
+                        <span class="badge bg-warning">5</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Approved this month:</span>
+                        <span class="badge bg-success">12</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Total Amount:</span>
+                        <span class="fw-bold">₱450,000.00</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function() {
+            // Auto-hide alerts after 5 seconds
+            setTimeout(function() {
+                $(".alert").fadeOut("slow");
+            }, 5000);
+
+            // Form validation
+            $("#searchForm").submit(function(e) {
+                var prNumber = $("#PRNumber").val();
+                if (!prNumber || prNumber.trim() === "") {
+                    e.preventDefault();
+                    alert("Please enter a PR Number");
+                }
+            });
+        });
+    </script>
+}
