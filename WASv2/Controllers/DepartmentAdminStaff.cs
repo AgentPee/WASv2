@@ -133,7 +133,6 @@ namespace WASv2.Controllers
         public bool IsSearched { get; set; }
         public bool IsFound { get; set; }
 
-        // PRF Details
         [Display(Name = "Department")]
         public string Department { get; set; }
 
@@ -152,14 +151,11 @@ namespace WASv2.Controllers
         [Display(Name = "Total Amount")]
         public decimal TotalAmount { get; set; }
 
-        // Items
         public List<PRFItemViewModel> Items { get; set; }
 
-        // Budget Confirmation
         [Display(Name = "Budget Confirmation")]
         public string BudgetConfirmation { get; set; }
 
-        // Uploaded File
         [Display(Name = "PRF File")]
         public string PRFFileName { get; set; }
 

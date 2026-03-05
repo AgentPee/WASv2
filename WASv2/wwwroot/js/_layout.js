@@ -46,10 +46,12 @@ function initializeTooltips() {
     }
 }
 
-// Confirm logout action (optional)
+// Confirm logout action
+/**
 function confirmLogout() {
     return confirm('Are you sure you want to logout?');
 }
+**/
 
 // Handle responsive sidebar toggle (if needed)
 function toggleSidebar() {
