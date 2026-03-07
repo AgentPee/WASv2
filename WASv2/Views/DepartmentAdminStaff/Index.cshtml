@@ -52,13 +52,16 @@
                             <span><i class="fa fa-file-invoice me-2"></i>PRF Details - @Model.PRNumber</span>
                             @if (!string.IsNullOrEmpty(Model.PRFFileName))
                             {
-                                <a href="#" class="btn btn-sm btn-light">
+                                <a asp-action="DownloadPRF"
+                                   asp-route-prNumber="@Model.PRNumber"
+                                   class="btn btn-sm btn-light"
+                                   title="Download PRF">
                                     <i class="fa fa-download me-1"></i>Download PRF
                                 </a>
                             }
                         </div>
                         <div class="card-body">
-                            <form asp-action="SubmitToDeptHead" method="post">
+                            <form asp-action="SubmitToDeptHead" method="post" enctype="multipart/form-data">
                                 <input type="hidden" asp-for="PRNumber" />
                                 <input type="hidden" asp-for="Department" />
                                 <input type="hidden" asp-for="RequestDate" />

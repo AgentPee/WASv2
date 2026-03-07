@@ -1,5 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Hosting;
+using System.IO;
+using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
 using System.Collections.Generic;
 using System;
 
@@ -7,6 +11,13 @@ namespace WASv2.Controllers
 {
     public class DepartmentAdminStaff : Controller
     {
+        private readonly IWebHostEnvironment _hostEnvironment;
+
+        public DepartmentAdminStaff(IWebHostEnvironment hostEnvironment)
+        {
+            _hostEnvironment = hostEnvironment;
+        }
+
         public IActionResult Index()
         {
             var model = new PRFViewModel
@@ -57,6 +68,38 @@ namespace WASv2.Controllers
             return View("Index", model);
         }
 
+        [HttpGet]
+        public IActionResult DownloadPRF(string prNumber)
+        {
+            if (string.IsNullOrEmpty(prNumber))
+            {
+                return NotFound();
+            }
+
+            // Get PRF details (replace with actual database call)
+            var prf = GetPRFByNumber(prNumber);
+
+            if (prf == null || string.IsNullOrEmpty(prf.PRFFileName))
+            {
+                return NotFound();
+            }
+
+            // Construct the file path
+            string uploadsFolder = Path.Combine(_hostEnvironment.WebRootPath, "prf-files");
+            string filePath = Path.Combine(uploadsFolder, prf.PRFFileName);
+
+            // If file doesn't exist, generate a sample file (for demo purposes)
+            if (!System.IO.File.Exists(filePath))
+            {
+                return GenerateSamplePRF(prf);
+            }
+
+            // Read the file and return it
+            byte[] fileBytes = System.IO.File.ReadAllBytes(filePath);
+            string contentType = GetContentType(filePath);
+            return File(fileBytes, contentType, prf.PRFFileName);
+        }
+
         [HttpPost]
         public IActionResult SubmitToDeptHead(PRFViewModel model)
         {
@@ -70,6 +113,51 @@ namespace WASv2.Controllers
             model.IsSearched = true;
             model.IsFound = true;
             return View("Index", model);
+        }
+
+        private IActionResult GenerateSamplePRF(PRFViewModel prf)
+        {
+            string content = $@"
+            PRF NUMBER: {prf.PRNumber}
+            DATE: {prf.RequestDate:MM/dd/yyyy}
+            DEPARTMENT: {prf.Department}
+            REQUESTED BY: {prf.RequestedBy}
+            PURPOSE: {prf.Purpose}
+            BUDGET LINE: {prf.BudgetLine}
+
+            ITEMS:
+            --------------------------------------------------
+            ";
+                        foreach (var item in prf.Items)
+                        {
+                            content += $"{item.ItemNo}. {item.Description} - {item.Quantity} {item.Unit} @ {item.UnitPrice:C2} = {item.TotalPrice:C2}\n";
+                        }
+
+                        content += $@"
+            --------------------------------------------------
+            TOTAL AMOUNT: {prf.TotalAmount:C2}
+
+            REMARKS: {prf.Remarks}
+            ";
+
+            byte[] fileBytes = System.Text.Encoding.UTF8.GetBytes(content);
+            return File(fileBytes, "text/plain", $"PRF_{prf.PRNumber}.txt");
+        }
+
+        // Helper method to determine content type
+        private string GetContentType(string filePath)
+        {
+            string extension = Path.GetExtension(filePath).ToLowerInvariant();
+            return extension switch
+            {
+                ".pdf" => "application/pdf",
+                ".jpg" or ".jpeg" => "image/jpeg",
+                ".png" => "image/png",
+                ".txt" => "text/plain",
+                ".doc" => "application/msword",
+                ".docx" => "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                _ => "application/octet-stream"
+            };
         }
 
         private PRFViewModel GetPRFByNumber(string prNumber)

@@ -11,7 +11,6 @@
         public const string TopManagement = "6";
         public const string ManagerDirector = "7";
 
-        // Get role name for display
         public static string GetRoleName(string roleId)
         {
             return roleId switch
@@ -27,25 +26,21 @@
             };
         }
 
-        // Get role name from integer (for controller use)
         public static string GetRoleName(int roleId)
         {
             return GetRoleName(roleId.ToString());
         }
 
-        // Check if user has specific role
         public static bool IsInRole(this System.Security.Claims.ClaimsPrincipal user, string roleId)
         {
             return user.Claims.Any(c => c.Type == System.Security.Claims.ClaimTypes.Role && c.Value == roleId);
         }
 
-        // Get user's role from claims
         public static string GetUserRole(this System.Security.Claims.ClaimsPrincipal user)
         {
             return user.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Role)?.Value ?? "";
         }
 
-        // Get controller name based on role (for redirection)
         public static string GetDashboardController(int roleId)
         {
             return roleId switch
@@ -61,10 +56,9 @@
             };
         }
 
-        // Get action name based on role
         public static string GetDashboardAction(int roleId)
         {
-            return "Index"; // All roles use Index action for dashboard
+            return "Index";
         }
     }
 }
