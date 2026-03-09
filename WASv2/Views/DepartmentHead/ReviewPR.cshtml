@@ -1,0 +1,193 @@
+﻿@model WASv2.Models.PRModel
+
+@{
+    ViewData["Title"] = "Review Purchase Request";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3">Review Purchase Request - @Model.PRNumber</h1>
+        <div>
+            <a asp-action="PendingPR" class="btn btn-secondary">
+                <i class="fa fa-arrow-left me-2"></i>Back to Pending PRs
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <!-- PR Details Card -->
+            <div class="card shadow mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fa fa-file-invoice me-2"></i>Purchase Request Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="fw-bold">PR Number:</label>
+                            <p>@Model.PRNumber</p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="fw-bold">Request Date:</label>
+                            <p>@Model.RequestDate.ToString("MMM dd, yyyy")</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="fw-bold">Department:</label>
+                            <p>@Model.Department</p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="fw-bold">Requested By:</label>
+                            <p>@Model.RequestedBy</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="fw-bold">Budget Line:</label>
+                            <p>@Model.BudgetLine</p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="fw-bold">Budget Confirmation:</label>
+                            <p>
+                                @if (Model.BudgetConfirmation == "Confirmed (Stock Replenishment)")
+                                {
+                                    <span class="badge bg-success">Confirmed</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning">Subject for Approval</span>
+                                }
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="fw-bold">Purpose:</label>
+                        <p>@Model.Purpose</p>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="fw-bold">Requestor Remarks:</label>
+                        <p>@(string.IsNullOrEmpty(Model.Remarks) ? "No remarks provided" : Model.Remarks)</p>
+                    </div>
+
+                    <!-- Items Table -->
+                    <h6 class="fw-bold mt-4">Items Requested</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Item No.</th>
+                                    <th>Description</th>
+                                    <th>Quantity</th>
+                                    <th>Unit</th>
+                                    <th>Unit Price</th>
+                                    <th>Total Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.Items)
+                                {
+                                    <tr>
+                                        <td>@item.ItemNo</td>
+                                        <td>@item.Description</td>
+                                        <td>@item.Quantity</td>
+                                        <td>@item.Unit</td>
+                                        <td class="text-end">@item.UnitPrice.ToString("C2")</td>
+                                        <td class="text-end">@item.TotalPrice.ToString("C2")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                            <tfoot class="table-secondary">
+                                <tr>
+                                    <td colspan="5" class="text-end fw-bold">Total Amount:</td>
+                                    <td class="text-end fw-bold">@Model.TotalAmount.ToString("C2")</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <!-- Action Card -->
+            <div class="card shadow mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fa fa-check-circle me-2"></i>Approval Action</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="ApprovePR" method="post" class="mb-3">
+                        <input type="hidden" name="prNumber" value="@Model.PRNumber" />
+                        <div class="mb-3">
+                            <label class="fw-bold">Approval Remarks (Optional)</label>
+                            <textarea name="remarks" class="form-control" rows="2" placeholder="Add any comments..."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100 mb-2" onclick="return confirm('Approve this purchase request?')">
+                            <i class="fa fa-check me-2"></i>Approve PR
+                        </button>
+                    </form>
+
+                    <form asp-action="DisapprovePR" method="post">
+                        <input type="hidden" name="prNumber" value="@Model.PRNumber" />
+                        <div class="mb-3">
+                            <label class="fw-bold">Disapproval Reason <span class="text-danger">*</span></label>
+                            <textarea name="remarks" class="form-control" rows="2" placeholder="Please provide reason for disapproval..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-danger w-100" onclick="return confirm('Disapprove this purchase request? This action cannot be undone.')">
+                            <i class="fa fa-times me-2"></i>Disapprove PR
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- PRF Download Card -->
+            <div class="card shadow mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fa fa-file-pdf me-2"></i>Supporting Documents</h5>
+                </div>
+                <div class="card-body">
+                    <a asp-action="DownloadPRF"
+                       asp-route-prNumber="@Model.PRNumber"
+                       class="btn btn-outline-info w-100"
+                       target="_blank">
+                        <i class="fa fa-download me-2"></i>Download PRF Document
+                    </a>
+                </div>
+            </div>
+
+            <!-- Timeline Card -->
+            <div class="card shadow">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0"><i class="fa fa-history me-2"></i>Timeline</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="fa fa-calendar text-primary me-2"></i>
+                            <strong>Requested:</strong> @Model.RequestDate.ToString("MMM dd, yyyy")
+                        </li>
+                        <li class="mb-2">
+                            <i class="fa fa-clock text-warning me-2"></i>
+                            <strong>Submitted:</strong> @Model.SubmittedDate.ToString("MMM dd, yyyy")
+                        </li>
+                        @if (Model.ReviewedDate.HasValue)
+                        {
+                            <li class="mb-2">
+                                <i class="fa fa-check-circle text-success me-2"></i>
+                                <strong>Reviewed:</strong> @Model.ReviewedDate.Value.ToString("MMM dd, yyyy")
+                            </li>
+                            <li>
+                                <i class="fa fa-user text-info me-2"></i>
+                                <strong>Reviewed By:</strong> @Model.ReviewedBy
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
