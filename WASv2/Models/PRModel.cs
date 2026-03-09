@@ -39,13 +39,13 @@ namespace WASv2.Models
         public string BudgetConfirmation { get; set; }
 
         [Display(Name = "PRF File Name")]
-        public string PRFFileName { get; set; }
+        public string? PRFFileName { get; set; }
 
         [Display(Name = "PRF File Path")]
-        public string PRFFilePath { get; set; }
+        public string? PRFFilePath { get; set; }
 
         [Display(Name = "Remarks")]
-        public string Remarks { get; set; }
+        public string? Remarks { get; set; }
 
         [Display(Name = "Status")]
         public PRStatus Status { get; set; }
@@ -57,10 +57,10 @@ namespace WASv2.Models
         public DateTime? ReviewedDate { get; set; }
 
         [Display(Name = "Reviewed By")]
-        public string ReviewedBy { get; set; }
+        public string? ReviewedBy { get; set; }
 
         [Display(Name = "Approval Remarks")]
-        public string ApprovalRemarks { get; set; }
+        public string? ApprovalRemarks { get; set; }
 
         public List<PRItemModel> Items { get; set; }
     }

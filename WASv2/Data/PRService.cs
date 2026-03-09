@@ -46,13 +46,40 @@ namespace WASv2.Data
 
         public PRModel CreatePR(PRModel prModel)
         {
-            prModel.Status = PRStatus.Pending;
-            prModel.SubmittedDate = DateTime.Now;
+            try
+            {
+                Console.WriteLine($"PRService.CreatePR - Starting for PR: {prModel.PRNumber}");
 
-            _context.PRs.Add(prModel);
-            _context.SaveChanges();
+                prModel.Status = PRStatus.Pending;
+                prModel.SubmittedDate = DateTime.Now;
 
-            return prModel;
+                Console.WriteLine("Adding to context...");
+                _context.PRs.Add(prModel);
+
+                Console.WriteLine("Saving changes...");
+                var result = _context.SaveChanges();
+                Console.WriteLine($"SaveChanges result: {result} records saved");
+
+                if (result > 0)
+                {
+                    Console.WriteLine($"PR saved successfully with ID: {prModel.Id}");
+                    return prModel;
+                }
+                else
+                {
+                    Console.WriteLine("No records were saved");
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"ERROR in CreatePR: {ex.Message}");
+                if (ex.InnerException != null)
+                {
+                    Console.WriteLine($"Inner Exception: {ex.InnerException.Message}");
+                }
+                throw;
+            }
         }
 
         public bool ApprovePR(string prNumber, string reviewedBy, string remarks)
@@ -121,5 +148,7 @@ namespace WASv2.Data
                 .OrderByDescending(p => p.SubmittedDate)
                 .ToList();
         }
+
+
     }
 }

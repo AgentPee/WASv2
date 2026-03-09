@@ -104,14 +104,23 @@ namespace WASv2.Controllers
         [HttpPost]
         public async Task<IActionResult> SubmitToDeptHead(PRFViewModel model, IFormFile prfFile)
         {
+            Console.WriteLine("=== SubmitToDeptHead Started ===");
+            Console.WriteLine($"ModelState IsValid: {ModelState.IsValid}");
+            Console.WriteLine($"PR Number: {model.PRNumber}");
+            Console.WriteLine($"File received: {(prfFile != null ? prfFile.FileName : "No file")}");
+
             if (ModelState.IsValid)
             {
                 try
                 {
+                    Console.WriteLine("ModelState is valid, processing submission...");
+
                     string fileName = model.PRFFileName;
                     if (prfFile != null && prfFile.Length > 0)
                     {
+                        Console.WriteLine($"Saving file: {prfFile.FileName}");
                         fileName = await SavePRFFile(prfFile, model.PRNumber);
+                        Console.WriteLine($"File saved as: {fileName}");
                     }
 
                     var prModel = new PRModel
@@ -141,25 +150,42 @@ namespace WASv2.Controllers
                         }).ToList() ?? new List<PRItemModel>()
                     };
 
-                    // Save to database using PR service
+                    Console.WriteLine("Calling PRService.CreatePR...");
                     var savedPR = _prService.CreatePR(prModel);
+                    Console.WriteLine($"CreatePR result: {(savedPR != null ? "Success" : "Failed")}");
 
                     if (savedPR != null)
                     {
+                        Console.WriteLine("PR saved successfully, redirecting...");
                         TempData["SuccessMessage"] = $"PR #{model.PRNumber} has been submitted to Department Head successfully!";
                         return RedirectToAction("Index");
                     }
                     else
                     {
+                        Console.WriteLine("CreatePR returned null");
                         ModelState.AddModelError("", "Failed to submit PR. Please try again.");
                     }
                 }
                 catch (Exception ex)
                 {
+                    Console.WriteLine($"EXCEPTION: {ex.Message}");
+                    Console.WriteLine($"Stack Trace: {ex.StackTrace}");
                     ModelState.AddModelError("", $"Error submitting PR: {ex.Message}");
                 }
             }
+            else
+            {
+                Console.WriteLine("ModelState is invalid. Errors:");
+                foreach (var modelState in ModelState.Values)
+                {
+                    foreach (var error in modelState.Errors)
+                    {
+                        Console.WriteLine($"- {error.ErrorMessage}");
+                    }
+                }
+            }
 
+            Console.WriteLine("Returning to Index view");
             model.IsSearched = true;
             model.IsFound = true;
             return View("Index", model);
@@ -320,8 +346,86 @@ namespace WASv2.Controllers
 
         public IActionResult CreatePR()
         {
-            return View();
+            var model = new PRFViewModel
+            {
+                RequestDate = DateTime.Now,
+                BudgetConfirmation = "Confirmed (Stock Replenishment)",
+                Items = new List<PRFItemViewModel>()
+            };
+            return View(model);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> CreatePR(PRFViewModel model, IFormFile prfFile)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var existingPR = _prService.GetPRByNumber(model.PRNumber);
+                    if (existingPR != null)
+                    {
+                        ModelState.AddModelError("PRNumber", "PR Number already exists. Please use a different number.");
+                        return View(model);
+                    }
+
+                    string fileName = null;
+                    if (prfFile != null && prfFile.Length > 0)
+                    {
+                        fileName = await SavePRFFile(prfFile, model.PRNumber);
+                    }
+
+                    decimal totalAmount = model.Items?.Sum(i => i.Quantity * i.UnitPrice) ?? 0;
+
+                    var prModel = new PRModel
+                    {
+                        PRNumber = model.PRNumber,
+                        Department = model.Department,
+                        RequestDate = model.RequestDate,
+                        RequestedBy = model.RequestedBy,
+                        RequestedById = GetCurrentUserId(),
+                        Purpose = model.Purpose,
+                        BudgetLine = model.BudgetLine,
+                        TotalAmount = totalAmount,
+                        BudgetConfirmation = model.BudgetConfirmation,
+                        PRFFileName = fileName,
+                        PRFFilePath = fileName != null ? $"/prf-files/{fileName}" : null,
+                        Remarks = model.Remarks,
+                        Status = PRStatus.Pending,
+                        SubmittedDate = DateTime.Now,
+                        Items = model.Items?.Select(i => new PRItemModel
+                        {
+                            ItemNo = i.ItemNo,
+                            Description = i.Description,
+                            Quantity = i.Quantity,
+                            Unit = i.Unit,
+                            UnitPrice = i.UnitPrice,
+                            TotalPrice = i.Quantity * i.UnitPrice
+                        }).ToList() ?? new List<PRItemModel>()
+                    };
+
+                    var savedPR = _prService.CreatePR(prModel);
+
+                    if (savedPR != null)
+                    {
+                        TempData["SuccessMessage"] = $"PR #{model.PRNumber} has been created successfully!";
+                        return RedirectToAction("Index");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("", "Failed to create PR. Please try again.");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("", $"Error creating PR: {ex.Message}");
+                }
+            }
+
+            return View(model);
+        }
+
+
     }
 
     public class PRFViewModel
