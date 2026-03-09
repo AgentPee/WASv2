@@ -21,10 +21,10 @@ namespace WASv2
 
             builder.Services.AddScoped<IClaimsTransformation, ClaimsTransformation>();
 
-            // Add services to the container.
+            builder.Services.AddScoped<IPRService, PRService>();
+
             builder.Services.AddControllersWithViews();
 
-            // Authentication must be registered before building the app
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>
                 {

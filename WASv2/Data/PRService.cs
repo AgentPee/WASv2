@@ -46,11 +46,9 @@ namespace WASv2.Data
 
         public PRModel CreatePR(PRModel prModel)
         {
-            // Set initial status and dates
             prModel.Status = PRStatus.Pending;
             prModel.SubmittedDate = DateTime.Now;
 
-            // Add to database
             _context.PRs.Add(prModel);
             _context.SaveChanges();
 
