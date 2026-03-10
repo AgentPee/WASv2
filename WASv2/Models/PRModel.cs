@@ -100,8 +100,17 @@ namespace WASv2.Models
         [Display(Name = "Disapproved by Department Head")]
         Disapproved = 3,
 
-        [Display(Name = "Forwarded to Procurement")]
-        Forwarded = 4
+        [Display(Name = "Forwarded to Purchasing")]
+        Forwarded = 4,
+
+        [Display(Name = "Pending Director Approval")]
+        PendingDirectorApproval = 5,
+
+        [Display(Name = "Approved by Director")]
+        DirectorApproved = 6,
+
+        [Display(Name = "Rejected by Director")]
+        DirectorRejected = 7
     }
 
     public class PendingPRViewModel

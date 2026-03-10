@@ -21,6 +21,7 @@
                     <i class="fa fa-file-invoice me-2"></i>Purchase Request Form (PRF)
                 </div>
                 <div class="card-body">
+                    <div asp-validation-summary="All" class="text-danger mb-3"></div>
                     <form asp-action="CreatePR" method="post" enctype="multipart/form-data">
                         <!-- PR Number -->
                         <div class="row mb-3">
@@ -96,7 +97,7 @@
                         <!-- Upload PRF -->
                         <div class="mb-3">
                             <label class="form-label fw-bold">Upload PRF Document (PDF/Image)</label>
-                            <input type="file" class="form-control" name="prfFile" accept=".pdf,.jpg,.jpeg,.png" />
+                            <input asp-for="PRFFileName" type="file" class="form-control" name="prfFile" accept=".pdf,.jpg,.jpeg,.png" />
                             <small class="text-muted">Upload scanned PRF or supporting document</small>
                         </div>
 
@@ -192,6 +193,33 @@
 
         function removeItem(id) {
             document.getElementById(`item-${id}`).remove();
+            renumberItems();
+        }
+
+        function renumberItems() {
+            const container = document.getElementById('items-container');
+            const items = container.children;
+            for (let i = 0; i < items.length; i++) {
+                const itemDiv = items[i];
+                // Update all input names to use the new index
+                const inputs = itemDiv.querySelectorAll('input, select');
+                inputs.forEach(input => {
+                    const name = input.getAttribute('name');
+                    if (name) {
+                        const newName = name.replace(/Items\[\d+\]/, `Items[${i}]`);
+                        input.setAttribute('name', newName);
+                    }
+                });
+                // Update the displayed item number (optional)
+                const itemNoInput = itemDiv.querySelector('input[name$=".ItemNo"]');
+                if (itemNoInput) {
+                    itemNoInput.value = i + 1;
+                }
+                // Update the div's id (for the remove button)
+                itemDiv.id = `item-${i + 1}`;
+            }
+            // Update global itemCount
+            itemCount = items.length;
         }
 
         // Add first item by default

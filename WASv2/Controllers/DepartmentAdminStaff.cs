@@ -358,6 +358,35 @@ namespace WASv2.Controllers
         [HttpPost]
         public async Task<IActionResult> CreatePR(PRFViewModel model, IFormFile prfFile)
         {
+            Console.WriteLine("=== CreatePR POST ===");
+            Console.WriteLine($"ModelState.IsValid: {ModelState.IsValid}");
+            Console.WriteLine($"PRNumber: {model.PRNumber}");
+            Console.WriteLine($"Items count: {model.Items?.Count ?? 0}");
+            if (model.Items != null)
+            {
+                foreach (var item in model.Items)
+                {
+                    Console.WriteLine($"  Item {item.ItemNo}: {item.Description}, Qty: {item.Quantity}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Items is null");
+            }
+
+            // Also log ModelState errors
+            if (!ModelState.IsValid)
+            {
+                foreach (var key in ModelState.Keys)
+                {
+                    var state = ModelState[key];
+                    foreach (var error in state.Errors)
+                    {
+                        Console.WriteLine($"Validation error on {key}: {error.ErrorMessage}");
+                    }
+                }
+            }
+
             if (ModelState.IsValid)
             {
                 try
@@ -461,7 +490,7 @@ namespace WASv2.Controllers
         public string BudgetConfirmation { get; set; }
 
         [Display(Name = "PRF File")]
-        public string PRFFileName { get; set; }
+        public string? PRFFileName { get; set; }
 
         [Display(Name = "Remarks")]
         public string Remarks { get; set; }

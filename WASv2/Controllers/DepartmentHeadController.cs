@@ -66,25 +66,23 @@ namespace WASv2.Controllers
         [HttpPost]
         public IActionResult ApprovePR(string prNumber, string remarks)
         {
-            var reviewedBy = User.Identity.Name ?? "Department Head"; // Get actual user name
-            var result = _prService.ApprovePR(prNumber, reviewedBy, remarks);
-
+            var reviewedBy = User.Identity.Name ?? "Department Head";
+            var result = _prService.DepartmentHeadApprovePR(prNumber, reviewedBy, remarks);
             if (result)
             {
-                TempData["SuccessMessage"] = $"PR #{prNumber} has been approved successfully.";
+                TempData["SuccessMessage"] = $"PR #{prNumber} has been approved and forwarded to the Director.";
             }
             else
             {
                 TempData["ErrorMessage"] = $"Failed to approve PR #{prNumber}.";
             }
-
             return RedirectToAction("PendingPR");
         }
 
         [HttpPost]
         public IActionResult DisapprovePR(string prNumber, string remarks)
         {
-            var reviewedBy = User.Identity.Name ?? "Department Head"; // Get actual user name
+            var reviewedBy = User.Identity.Name ?? "Department Head";
             var result = _prService.DisapprovePR(prNumber, reviewedBy, remarks);
 
             if (result)
@@ -123,6 +121,21 @@ namespace WASv2.Controllers
             byte[] fileBytes = System.Text.Encoding.UTF8.GetBytes(content);
 
             return File(fileBytes, "text/plain", $"PRF_{pr.PRNumber}.txt");
+        }
+
+        [HttpPost]
+        public IActionResult ForwardToDirector(string prNumber)
+        {
+            var result = _prService.ForwardToDirector(prNumber);
+            if (result)
+            {
+                TempData["SuccessMessage"] = $"PR #{prNumber} forwarded to Director for final approval.";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = $"Failed to forward PR #{prNumber}.";
+            }
+            return RedirectToAction("PendingPR");
         }
 
         private string GeneratePRFContent(PRModel pr)

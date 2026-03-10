@@ -30,6 +30,72 @@ namespace WASv2.Data
             return query.OrderByDescending(p => p.SubmittedDate).ToList();
         }
 
+        public bool DepartmentHeadApprovePR(string prNumber, string reviewedBy, string remarks)
+        {
+            var pr = GetPRByNumber(prNumber);
+            if (pr != null && pr.Status == PRStatus.Pending)
+            {
+                pr.Status = PRStatus.PendingDirectorApproval;
+                pr.ReviewedDate = DateTime.Now;
+                pr.ReviewedBy = reviewedBy;
+                pr.ApprovalRemarks = remarks;
+                _context.SaveChanges();
+                return true;
+            }
+            return false;
+        }
+
+        public List<PRModel> GetPRsForDirector()
+        {
+            return _context.PRs
+                .Include(p => p.Items)
+                .Where(p => p.Status == PRStatus.PendingDirectorApproval)
+                .OrderByDescending(p => p.SubmittedDate)
+                .ToList();
+        }
+
+        public bool ForwardToDirector(string prNumber)
+        {
+            var pr = GetPRByNumber(prNumber);
+            if (pr != null && pr.Status == PRStatus.Approved)
+            {
+                pr.Status = PRStatus.PendingDirectorApproval;
+                _context.SaveChanges();
+                return true;
+            }
+            return false;
+        }
+
+        public bool DirectorApprove(string prNumber, string reviewedBy, string remarks)
+        {
+            var pr = GetPRByNumber(prNumber);
+            if (pr != null && pr.Status == PRStatus.PendingDirectorApproval)
+            {
+                pr.Status = PRStatus.DirectorApproved;
+                pr.ReviewedDate = DateTime.Now;
+                pr.ReviewedBy = reviewedBy;
+                pr.ApprovalRemarks = remarks;
+                _context.SaveChanges();
+                return true;
+            }
+            return false;
+        }
+
+        public bool DirectorReject(string prNumber, string reviewedBy, string remarks)
+        {
+            var pr = GetPRByNumber(prNumber);
+            if (pr != null && pr.Status == PRStatus.PendingDirectorApproval)
+            {
+                pr.Status = PRStatus.DirectorRejected;
+                pr.ReviewedDate = DateTime.Now;
+                pr.ReviewedBy = reviewedBy;
+                pr.ApprovalRemarks = remarks;
+                _context.SaveChanges();
+                return true;
+            }
+            return false;
+        }
+
         public PRModel GetPRByNumber(string prNumber)
         {
             return _context.PRs
@@ -48,36 +114,16 @@ namespace WASv2.Data
         {
             try
             {
-                Console.WriteLine($"PRService.CreatePR - Starting for PR: {prModel.PRNumber}");
-
-                prModel.Status = PRStatus.Pending;
-                prModel.SubmittedDate = DateTime.Now;
-
-                Console.WriteLine("Adding to context...");
                 _context.PRs.Add(prModel);
-
-                Console.WriteLine("Saving changes...");
-                var result = _context.SaveChanges();
-                Console.WriteLine($"SaveChanges result: {result} records saved");
-
-                if (result > 0)
-                {
-                    Console.WriteLine($"PR saved successfully with ID: {prModel.Id}");
-                    return prModel;
-                }
-                else
-                {
-                    Console.WriteLine("No records were saved");
-                    return null;
-                }
+                int result = _context.SaveChanges();
+                Console.WriteLine($"SaveChanges result: {result}");
+                return result > 0 ? prModel : null;
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"ERROR in CreatePR: {ex.Message}");
                 if (ex.InnerException != null)
-                {
-                    Console.WriteLine($"Inner Exception: {ex.InnerException.Message}");
-                }
+                    Console.WriteLine($"Inner: {ex.InnerException.Message}");
                 throw;
             }
         }
