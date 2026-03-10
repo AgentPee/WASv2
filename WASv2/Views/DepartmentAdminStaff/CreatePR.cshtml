@@ -1,34 +1,228 @@
-﻿@{
-    ViewData["Title"] = "Create Purchase Request";
+﻿@model WASv2.Controllers.PRFViewModel
+
+@{
+    ViewData["Title"] = "Create New Purchase Request";
 }
-<div class="card shadow-sm">
-    <div class="card-header bg-primary text-white">
-        <h5 class="mb-0">Initiate New Purchase Request</h5>
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3">Create New Purchase Request</h1>
+        <div>
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="fa fa-arrow-left me-2"></i>Back to Search
+            </a>
+        </div>
     </div>
-    <div class="card-body">
-        <form>
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    <label class="form-label">PR Number</label>
-                    <input type="text" class="form-control" placeholder="Generated or Manual" required>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <i class="fa fa-file-invoice me-2"></i>Purchase Request Form (PRF)
                 </div>
-                <div class="col-md-6">
-                    <label class="form-label">Budget Confirmation</label>
-                    <select class="form-select">
-                        <option>Confirmed (Stock Replenishment)</option>
-                        <option>Pending</option>
-                    </select>
+                <div class="card-body">
+                    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+                    <form asp-action="CreatePR" method="post" enctype="multipart/form-data">
+                        <!-- PR Number -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label asp-for="PRNumber" class="form-label fw-bold"></label>
+                                <input asp-for="PRNumber" class="form-control" placeholder="PR-2026-XXX" />
+                                <span asp-validation-for="PRNumber" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="RequestDate" class="form-label fw-bold"></label>
+                                <input asp-for="RequestDate" class="form-control" type="date" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                                <span asp-validation-for="RequestDate" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Department and Requestor -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label asp-for="Department" class="form-label fw-bold"></label>
+                                <select asp-for="Department" class="form-select">
+                                    <option value="">Select Department</option>
+                                    <option value="Information Technology">Information Technology</option>
+                                    <option value="Human Resources">Human Resources</option>
+                                    <option value="Finance">Finance</option>
+                                    <option value="Administration">Administration</option>
+                                    <option value="Operations">Operations</option>
+                                </select>
+                                <span asp-validation-for="Department" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="RequestedBy" class="form-label fw-bold"></label>
+                                <input asp-for="RequestedBy" class="form-control" placeholder="Full Name" />
+                                <span asp-validation-for="RequestedBy" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Purpose and Budget Line -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label asp-for="Purpose" class="form-label fw-bold"></label>
+                                <input asp-for="Purpose" class="form-control" placeholder="Purpose of request" />
+                                <span asp-validation-for="Purpose" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="BudgetLine" class="form-label fw-bold"></label>
+                                <input asp-for="BudgetLine" class="form-control" placeholder="Budget Line Item" />
+                                <span asp-validation-for="BudgetLine" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Budget Confirmation -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label asp-for="BudgetConfirmation" class="form-label fw-bold"></label>
+                                <select asp-for="BudgetConfirmation" class="form-select">
+                                    <option value="Confirmed (Stock Replenishment)">Confirmed (Stock Replenishment)</option>
+                                    <option value="Subject for Approval">Subject for Approval</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Items Section -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Items</label>
+                            <div id="items-container">
+                                <!-- Items will be added here dynamically -->
+                            </div>
+                            <button type="button" class="btn btn-sm btn-success mt-2" onclick="addItem()">
+                                <i class="fa fa-plus me-1"></i>Add Item
+                            </button>
+                        </div>
+
+                        <!-- Upload PRF -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Upload PRF Document (PDF/Image)</label>
+                            <input asp-for="PRFFileName" type="file" class="form-control" name="prfFile" accept=".pdf,.jpg,.jpeg,.png" />
+                            <small class="text-muted">Upload scanned PRF or supporting document</small>
+                        </div>
+
+                        <!-- Remarks -->
+                        <div class="mb-3">
+                            <label asp-for="Remarks" class="form-label fw-bold"></label>
+                            <textarea asp-for="Remarks" class="form-control" rows="3" placeholder="Additional notes or remarks"></textarea>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fa fa-save me-2"></i>Save Purchase Request
+                        </button>
+                    </form>
                 </div>
             </div>
-            <div class="mb-3">
-                <label class="form-label">Remarks/Reason</label>
-                <textarea class="form-control" rows="3"></textarea>
+        </div>
+
+        <!-- Instructions Sidebar -->
+        <div class="col-md-4">
+            <div class="card shadow">
+                <div class="card-header bg-info text-white">
+                    <i class="fa fa-info-circle me-2"></i>Instructions
+                </div>
+                <div class="card-body">
+                    <h6>PR Number Format:</h6>
+                    <p class="text-muted">PR-YYYY-XXX (e.g., PR-2026-001)</p>
+
+                    <h6>Required Fields:</h6>
+                    <ul class="text-muted">
+                        <li>PR Number</li>
+                        <li>Department</li>
+                        <li>Requested By</li>
+                        <li>Purpose</li>
+                        <li>Budget Line</li>
+                        <li>At least one item</li>
+                    </ul>
+
+                    <h6>Note:</h6>
+                    <p class="text-muted">After saving, you can search for this PR using the PR Number in the search page.</p>
+                </div>
             </div>
-            <div class="mb-3">
-                <label class="form-label">Upload PRF (PDF/Scanned)</label>
-                <input type="file" class="form-control">
-            </div>
-            <button type="submit" class="btn btn-success">Submit to Dept Head</button>
-        </form>
+        </div>
     </div>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        let itemCount = 0;
+
+        function addItem() {
+            itemCount++;
+            const container = document.getElementById('items-container');
+            const itemHtml = `
+                <div class="card mb-2 p-2" id="item-${itemCount}">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <label class="form-label">Item No.</label>
+                            <input type="text" class="form-control" name="Items[${itemCount-1}].ItemNo" value="${itemCount}" readonly />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Description</label>
+                            <input type="text" class="form-control" name="Items[${itemCount-1}].Description" required />
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Quantity</label>
+                            <input type="number" class="form-control" name="Items[${itemCount-1}].Quantity" required min="1" />
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Unit</label>
+                            <select class="form-control" name="Items[${itemCount-1}].Unit">
+                                <option value="pcs">pcs</option>
+                                <option value="box">box</option>
+                                <option value="unit">unit</option>
+                                <option value="set">set</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Unit Price</label>
+                            <input type="number" class="form-control" name="Items[${itemCount-1}].UnitPrice" step="0.01" required />
+                        </div>
+                        <div class="col-md-12 mt-2">
+                            <button type="button" class="btn btn-sm btn-danger" onclick="removeItem(${itemCount})">
+                                <i class="fa fa-trash"></i> Remove
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', itemHtml);
+        }
+
+        function removeItem(id) {
+            document.getElementById(`item-${id}`).remove();
+            renumberItems();
+        }
+
+        function renumberItems() {
+            const container = document.getElementById('items-container');
+            const items = container.children;
+            for (let i = 0; i < items.length; i++) {
+                const itemDiv = items[i];
+                // Update all input names to use the new index
+                const inputs = itemDiv.querySelectorAll('input, select');
+                inputs.forEach(input => {
+                    const name = input.getAttribute('name');
+                    if (name) {
+                        const newName = name.replace(/Items\[\d+\]/, `Items[${i}]`);
+                        input.setAttribute('name', newName);
+                    }
+                });
+                // Update the displayed item number (optional)
+                const itemNoInput = itemDiv.querySelector('input[name$=".ItemNo"]');
+                if (itemNoInput) {
+                    itemNoInput.value = i + 1;
+                }
+                // Update the div's id (for the remove button)
+                itemDiv.id = `item-${i + 1}`;
+            }
+            // Update global itemCount
+            itemCount = items.length;
+        }
+
+        // Add first item by default
+        addItem();
+    </script>
+}

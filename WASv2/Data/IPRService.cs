@@ -14,5 +14,12 @@ namespace WASv2.Data
         bool ForwardToProcurement(string prNumber);
         List<PRModel> GetPRsByStatus(PRStatus status, string department = null);
         List<PRModel> GetPRsByDepartment(string department);
+
+        List<PRModel> GetPRsForDirector();
+        bool ForwardToDirector(string prNumber);
+        bool DirectorApprove(string prNumber, string reviewedBy, string remarks);
+        bool DirectorReject(string prNumber, string reviewedBy, string remarks);
+        bool DepartmentHeadApprovePR(string prNumber, string reviewedBy, string remarks);
     }
+
 }

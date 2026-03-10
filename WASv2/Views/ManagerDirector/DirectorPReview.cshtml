@@ -1,41 +1,108 @@
-﻿<div class="card shadow border-0">
-    <div class="card-header bg-dark text-white d-flex justify-content-between">
-        <span>Director Review Mode</span>
-        <span class="small">Ref: PR-2026-105</span>
+﻿@model WASv2.Models.PRModel
+@{
+    ViewData["Title"] = "Director Review";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3">Director Review - @Model.PRNumber</h1>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="fa fa-arrow-left me-2"></i>Back to List
+        </a>
     </div>
-    <div class="card-body">
-        <div class="row mb-4">
-            <div class="col-md-6 border-end">
-                <h6 class="text-muted">Request Details</h6>
-                <p><strong>Requestor:</strong> Admin Staff - IT</p>
-                <p><strong>Dept Head Approval:</strong> <span class="badge bg-success">Verified Feb 24</span></p>
-                <p><strong>Reason:</strong> Essential for annual compliance.</p>
-            </div>
-            <div class="col-md-6">
-                <h6 class="text-muted">Attached Documents</h6>
-                <div class="p-2 border rounded bg-light mb-2">
-                    <i class="fas fa-file-pdf text-danger me-2"></i> PR_Form_Final.pdf
-                </div>
-                <div class="p-2 border rounded bg-light">
-                    <i class="fas fa-file-excel text-success me-2"></i> Budget_Confirmation.xlsx
-                </div>
-            </div>
+
+    <div class="card shadow border-0">
+        <div class="card-header bg-dark text-white d-flex justify-content-between">
+            <span>Director Review Mode</span>
+            <span class="small">Ref: @Model.PRNumber</span>
         </div>
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-md-6 border-end">
+                    <h6 class="text-muted">Request Details</h6>
+                    <p><strong>Requestor:</strong> @Model.RequestedBy</p>
+                    <p><strong>Department:</strong> @Model.Department</p>
+                    <p><strong>Dept Head Approval:</strong> <span class="badge bg-success">Verified @(Model.ReviewedDate?.ToString("MMM dd") ?? "N/A")</span></p>
+                    <p><strong>Purpose:</strong> @Model.Purpose</p>
+                    <p><strong>Budget Line:</strong> @Model.BudgetLine</p>
+                    <p><strong>Total Amount:</strong> @Model.TotalAmount.ToString("C2")</p>
+                    <p><strong>Remarks:</strong> @Model.Remarks</p>
+                </div>
+                <div class="col-md-6">
+                    <h6 class="text-muted">Attached Documents</h6>
+                    @if (!string.IsNullOrEmpty(Model.PRFFileName))
+                    {
+                        <div class="p-2 border rounded bg-light mb-2">
+                            <i class="fas fa-file-pdf text-danger me-2"></i> @Model.PRFFileName
+                        </div>
+                        <a asp-action="DownloadPRF" asp-route-prNumber="@Model.PRNumber" class="btn btn-sm btn-outline-secondary">
+                            <i class="fa fa-download me-1"></i>Download
+                        </a>
+                    }
+                    else
+                    {
+                        <p class="text-muted">No document uploaded</p>
+                    }
+                </div>
+            </div>
 
-        <div class="alert alert-secondary">
-            <h6>Director Decision</h6>
-            <div class="d-flex gap-2">
-                <button class="btn btn-success flex-grow-1"><i class="fas fa-check-double me-2"></i>Approve & Send to Purchasing</button>
+            <!-- Items table -->
+            @if (Model.Items != null && Model.Items.Any())
+            {
+                <h6 class="text-muted mt-3">Items</h6>
+                <table class="table table-sm table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Item No.</th>
+                            <th>Description</th>
+                            <th>Qty</th>
+                            <th>Unit</th>
+                            <th>Unit Price</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Items)
+                        {
+                            <tr>
+                                <td>@item.ItemNo</td>
+                                <td>@item.Description</td>
+                                <td>@item.Quantity</td>
+                                <td>@item.Unit</td>
+                                <td>@item.UnitPrice.ToString("C2")</td>
+                                <td>@item.TotalPrice.ToString("C2")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
 
-                <button class="btn btn-outline-danger flex-grow-1" data-bs-toggle="collapse" data-bs-target="#disapprovePanel">
+            <div class="alert alert-secondary mt-4">
+                <h6>Director Decision</h6>
+                <form asp-action="ApprovePR" method="post" class="d-inline">
+                    <input type="hidden" name="prNumber" value="@Model.PRNumber" />
+                    <div class="mb-2">
+                        <label>Remarks (optional)</label>
+                        <input type="text" name="remarks" class="form-control" placeholder="Approval remarks" />
+                    </div>
+                    <button type="submit" class="btn btn-success flex-grow-1">
+                        <i class="fas fa-check-double me-2"></i>Approve & Send to Purchasing
+                    </button>
+                </form>
+
+                <button class="btn btn-outline-danger flex-grow-1 mt-2" data-bs-toggle="collapse" data-bs-target="#rejectPanel">
                     <i class="fas fa-undo me-2"></i>Return for Correction
                 </button>
-            </div>
 
-            <div class="collapse mt-3" id="disapprovePanel">
-                <div class="card card-body bg-light">
-                    <label class="form-label">Justification for Return (Required)</label>
-                    <textarea class="form-control" rows="3" placeholder="Explain what needs to be changed..."></textarea>
+                <div class="collapse mt-3" id="rejectPanel">
+                    <form asp-action="RejectPR" method="post">
+                        <input type="hidden" name="prNumber" value="@Model.PRNumber" />
+                        <div class="card card-body bg-light">
+                            <label class="form-label">Justification for Return (Required)</label>
+                            <textarea name="remarks" class="form-control" rows="3" placeholder="Explain what needs to be changed..." required></textarea>
+                            <button type="submit" class="btn btn-danger mt-2">Confirm Reject</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
