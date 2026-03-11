@@ -18,17 +18,21 @@ namespace WASv2.Controllers
 
         public IActionResult Index()
         {
-            // Get counts for dashboard
-            var pendingPRs = _prService.GetPRsByStatus(PRStatus.Pending);
-            var approvedPRs = _prService.GetPRsByStatus(PRStatus.Approved);
+            var pendingPRs = _prService.GetPendingPRsForDepartmentHead();
 
-            ViewBag.PendingCount = pendingPRs.Count;
-            ViewBag.ApprovedCount = approvedPRs.Count;
-            ViewBag.TotalAmount = pendingPRs.Sum(p => p.TotalAmount);
+            var viewModel = new PendingPRViewModel
+            {
+                PendingPRs = pendingPRs,
+                TotalPending = pendingPRs.Count,
+                TotalApproved = _prService.GetPRsByStatus(PRStatus.ApprovedByDepartmentHead).Count,
+                TotalDisapproved = _prService.GetPRsByStatus(PRStatus.DisapprovedByDepartmentHead).Count
+            };
 
-            return View();
+            return View(viewModel);
         }
 
+        //moved to index method
+        /**
         public IActionResult PendingPR()
         {
             var pendingPRs = _prService.GetPendingPRsForDepartmentHead();
@@ -43,6 +47,7 @@ namespace WASv2.Controllers
 
             return View(viewModel);
         }
+        **/
 
         [HttpGet]
         public IActionResult ReviewPR(string prNumber)
