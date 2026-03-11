@@ -48,7 +48,8 @@ namespace WASv2.Models
         public string? Remarks { get; set; }
 
         [Display(Name = "Status")]
-        public PRStatus Status { get; set; }
+        //public PRStatus Status { get; set; }
+        public string Status { get; set; }
 
         [Display(Name = "Submitted Date")]
         public DateTime SubmittedDate { get; set; }
@@ -89,8 +90,10 @@ namespace WASv2.Models
         public PRModel PR { get; set; }
     }
 
-    public enum PRStatus
+    //public enum PRStatus
+    public static class PRStatus
     {
+        /**
         [Display(Name = "Pending Department Head Approval")]
         Pending = 1,
 
@@ -111,6 +114,15 @@ namespace WASv2.Models
 
         [Display(Name = "Rejected by Director")]
         DirectorRejected = 7
+        **/
+
+        public const string PendingDepartmentHeadApproval = "Pending Department Head Approval";
+        public const string ApprovedByDepartmentHead = "Approved by Department Head";
+        public const string DisapprovedByDepartmentHead = "Disapproved by Department Head";
+        public const string ForwardedToPurchasing = "Forwarded to Purchasing";
+        public const string PendingDirectorApproval = "Pending Director Approval";
+        public const string ApprovedByDirector = "Approved by Director";
+        public const string RejectedByDirector = "Rejected by Director";
     }
 
     public class PendingPRViewModel

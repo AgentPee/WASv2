@@ -1,101 +1,156 @@
-﻿@{
-    ViewData["Title"] = "Department Head Dashboard";
-    var pendingCount = ViewBag.PendingCount ?? 0;
-    var approvedCount = ViewBag.ApprovedCount ?? 0;
-    var totalAmount = ViewBag.TotalAmount ?? 0;
+﻿@model WASv2.Models.PendingPRViewModel
+
+@{
+    ViewData["Title"] = "Pending Purchase Requests";
 }
 
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3">Department Head Control Panel</h1>
+        <h1 class="h3">Pending Purchase Requests</h1>
         <div class="text-end">
-            <span class="badge bg-primary p-2">Role: Dept Head - IT</span>
+            <span class="badge bg-primary p-2">Department Head - Review Queue</span>
         </div>
     </div>
 
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Summary Cards -->
     <div class="row mb-4">
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-primary shadow h-100 py-2">
+        <div class="col-md-4">
+            <div class="card bg-warning text-white shadow">
                 <div class="card-body">
-                    <a asp-controller="DepartmentHead" asp-action="PendingPR" class="text-decoration-none">
-                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Pending PRs</div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800">@pendingCount Request(s)</div>
-                    </a>
+                    <div class="row align-items-center">
+                        <div class="col-3">
+                            <i class="fa fa-clock fa-3x"></i>
+                        </div>
+                        <div class="col-9 text-end">
+                            <h5 class="card-title mb-1">Pending PRs</h5>
+                            <h2 class="mb-0">@Model.TotalPending</h2>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-success shadow h-100 py-2">
+        <div class="col-md-4">
+            <div class="card bg-success text-white shadow">
                 <div class="card-body">
-                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Approved PRs</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">@approvedCount Request(s)</div>
+                    <div class="row align-items-center">
+                        <div class="col-3">
+                            <i class="fa fa-check-circle fa-3x"></i>
+                        </div>
+                        <div class="col-9 text-end">
+                            <h5 class="card-title mb-1">Approved</h5>
+                            <h2 class="mb-0">@Model.TotalApproved</h2>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-info shadow h-100 py-2">
+        <div class="col-md-4">
+            <div class="card bg-danger text-white shadow">
                 <div class="card-body">
-                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Total Amount</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">@totalAmount.ToString("C2")</div>
+                    <div class="row align-items-center">
+                        <div class="col-3">
+                            <i class="fa fa-times-circle fa-3x"></i>
+                        </div>
+                        <div class="col-9 text-end">
+                            <h5 class="card-title mb-1">Disapproved</h5>
+                            <h2 class="mb-0">@Model.TotalDisapproved</h2>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <div class="card shadow mb-4">
-        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-            <h6 class="m-0 font-weight-bold text-primary">Priority Approval Queue</h6>
-            <div class="dropdown no-arrow">
-                <button class="btn btn-sm btn-outline-secondary">Filter by Module</button>
-            </div>
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="fa fa-clock me-2"></i>Pending Purchase Requests for Approval</h5>
+            <span class="badge bg-light text-dark">@Model.TotalPending Request(s)</span>
         </div>
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Module</th>
-                            <th>Reference ID</th>
-                            <th>Requestor</th>
-                            <th>Summary</th>
-                            <th>Status</th>
-                            <th class="text-center">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><span class="badge bg-secondary">PR</span></td>
-                            <td>#PR-2026-0045</td>
-                            <td>Admin Staff (IT)</td>
-                            <td>Server Hardware Replenishment</td>
-                            <td><span class="text-primary"><i class="fas fa-clock"></i> Awaiting Review</span></td>
-                            <td class="text-center">
-                                <a asp-action="ReviewPR" class="btn btn-sm btn-primary">Open & Review</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><span class="badge bg-warning text-dark">PRM</span></td>
-                            <td>#PRM-INV-992</td>
-                            <td>Accounts Staff</td>
-                            <td>Cloud Subscription - Q1</td>
-                            <td><span class="text-danger"><i class="fas fa-pen-nib"></i> Signature Required</span></td>
-                            <td class="text-center">
-                                <a asp-action="SignMemo" class="btn btn-sm btn-success">E-Sign Now</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><span class="badge bg-info">CA</span></td>
-                            <td>#JO-2026-881</td>
-                            <td>Warehouse/PAM</td>
-                            <td>Network Cabling Completion</td>
-                            <td><span class="text-dark"><i class="fas fa-star"></i> Pending Rating</span></td>
-                            <td class="text-center">
-                                <a asp-action="Acceptance" class="btn btn-sm btn-dark">Rate & Accept</a>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+        <div class="card-body">
+            @if (Model.PendingPRs != null && Model.PendingPRs.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>PR Number</th>
+                                <th>Date Requested</th>
+                                <th>Department</th>
+                                <th>Requested By</th>
+                                <th>Purpose/Remarks</th>
+                                <th>Total Amount</th>
+                                <th>Budget Confirmed</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var pr in Model.PendingPRs)
+                            {
+                                <tr>
+                                    <td><strong>@pr.PRNumber</strong></td>
+                                    <td>@pr.RequestDate.ToString("MMM dd, yyyy")</td>
+                                    <td>@pr.Department</td>
+                                    <td>@pr.RequestedBy</td>
+                                    <td>
+                                        <small>@pr.Purpose</small>
+                                        @if (!string.IsNullOrEmpty(pr.Remarks))
+                                        {
+                                            <br />
+                                            <small class="text-muted"><i class="fa fa-comment me-1"></i>@pr.Remarks</small>
+                                        }
+                                    </td>
+                                    <td class="text-end">@pr.TotalAmount.ToString("C2")</td>
+                                    <td class="text-center">
+                                        @if (pr.BudgetConfirmation == "Confirmed (Stock Replenishment)")
+                                        {
+                                            <span class="badge bg-success">Yes</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-warning text-dark">Subject for Approval</span>
+                                        }
+                                    </td>
+                                    <td class="text-center">
+                                        <a asp-action="ReviewPR"
+                                           asp-route-prNumber="@pr.PRNumber"
+                                           class="btn btn-sm btn-info">
+                                            <i class="fa fa-eye me-1"></i>Review
+                                        </a>
+                                        <a asp-action="DownloadPRF"
+                                           asp-route-prNumber="@pr.PRNumber"
+                                           class="btn btn-sm btn-secondary"
+                                           target="_blank">
+                                            <i class="fa fa-download me-1"></i>PRF
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info mb-0">
+                    <i class="fa fa-info-circle me-2"></i>No pending purchase requests at this time.
+                </div>
+            }
         </div>
     </div>
 </div>

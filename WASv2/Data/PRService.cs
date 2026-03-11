@@ -20,7 +20,7 @@ namespace WASv2.Data
         {
             var query = _context.PRs
                 .Include(p => p.Items)
-                .Where(p => p.Status == PRStatus.Pending);
+                .Where(p => p.Status == PRStatus.PendingDepartmentHeadApproval);
 
             if (!string.IsNullOrEmpty(department))
             {
@@ -33,7 +33,7 @@ namespace WASv2.Data
         public bool DepartmentHeadApprovePR(string prNumber, string reviewedBy, string remarks)
         {
             var pr = GetPRByNumber(prNumber);
-            if (pr != null && pr.Status == PRStatus.Pending)
+            if (pr != null && pr.Status == PRStatus.PendingDepartmentHeadApproval)
             {
                 pr.Status = PRStatus.PendingDirectorApproval;
                 pr.ReviewedDate = DateTime.Now;
@@ -57,7 +57,7 @@ namespace WASv2.Data
         public bool ForwardToDirector(string prNumber)
         {
             var pr = GetPRByNumber(prNumber);
-            if (pr != null && pr.Status == PRStatus.Approved)
+            if (pr != null && pr.Status == PRStatus.ApprovedByDepartmentHead)
             {
                 pr.Status = PRStatus.PendingDirectorApproval;
                 _context.SaveChanges();
@@ -71,7 +71,7 @@ namespace WASv2.Data
             var pr = GetPRByNumber(prNumber);
             if (pr != null && pr.Status == PRStatus.PendingDirectorApproval)
             {
-                pr.Status = PRStatus.DirectorApproved;
+                pr.Status = PRStatus.ApprovedByDirector;
                 pr.ReviewedDate = DateTime.Now;
                 pr.ReviewedBy = reviewedBy;
                 pr.ApprovalRemarks = remarks;
@@ -86,7 +86,7 @@ namespace WASv2.Data
             var pr = GetPRByNumber(prNumber);
             if (pr != null && pr.Status == PRStatus.PendingDirectorApproval)
             {
-                pr.Status = PRStatus.DirectorRejected;
+                pr.Status = PRStatus.RejectedByDirector;
                 pr.ReviewedDate = DateTime.Now;
                 pr.ReviewedBy = reviewedBy;
                 pr.ApprovalRemarks = remarks;
@@ -131,9 +131,9 @@ namespace WASv2.Data
         public bool ApprovePR(string prNumber, string reviewedBy, string remarks)
         {
             var pr = GetPRByNumber(prNumber);
-            if (pr != null && pr.Status == PRStatus.Pending)
+            if (pr != null && pr.Status == PRStatus.PendingDepartmentHeadApproval)
             {
-                pr.Status = PRStatus.Approved;
+                pr.Status = PRStatus.ApprovedByDepartmentHead;
                 pr.ReviewedDate = DateTime.Now;
                 pr.ReviewedBy = reviewedBy;
                 pr.ApprovalRemarks = remarks;
@@ -147,9 +147,9 @@ namespace WASv2.Data
         public bool DisapprovePR(string prNumber, string reviewedBy, string remarks)
         {
             var pr = GetPRByNumber(prNumber);
-            if (pr != null && pr.Status == PRStatus.Pending)
+            if (pr != null && pr.Status == PRStatus.PendingDepartmentHeadApproval)
             {
-                pr.Status = PRStatus.Disapproved;
+                pr.Status = PRStatus.DisapprovedByDepartmentHead;
                 pr.ReviewedDate = DateTime.Now;
                 pr.ReviewedBy = reviewedBy;
                 pr.ApprovalRemarks = remarks;
@@ -163,16 +163,16 @@ namespace WASv2.Data
         public bool ForwardToProcurement(string prNumber)
         {
             var pr = GetPRByNumber(prNumber);
-            if (pr != null && pr.Status == PRStatus.Approved)
+            if (pr != null && pr.Status == PRStatus.ApprovedByDepartmentHead)
             {
-                pr.Status = PRStatus.Forwarded;
+                pr.Status = PRStatus.ForwardedToPurchasing;
                 _context.SaveChanges();
                 return true;
             }
             return false;
         }
 
-        public List<PRModel> GetPRsByStatus(PRStatus status, string department = null)
+        public List<PRModel> GetPRsByStatus(string status, string department = null)
         {
             var query = _context.PRs
                 .Include(p => p.Items)

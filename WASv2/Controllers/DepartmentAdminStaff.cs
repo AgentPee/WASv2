@@ -137,7 +137,7 @@ namespace WASv2.Controllers
                         PRFFileName = fileName,
                         PRFFilePath = $"/prf-files/{fileName}",
                         Remarks = model.Remarks,
-                        Status = PRStatus.Pending,
+                        Status = PRStatus.PendingDepartmentHeadApproval,
                         SubmittedDate = DateTime.Now,
                         Items = model.Items?.Select(i => new PRItemModel
                         {
@@ -342,6 +342,7 @@ namespace WASv2.Controllers
             };
 
             return samplePRFs.ContainsKey(prNumber) ? samplePRFs[prNumber] : null;
+            
         }
 
         public IActionResult CreatePR()
@@ -420,7 +421,7 @@ namespace WASv2.Controllers
                         PRFFileName = fileName,
                         PRFFilePath = fileName != null ? $"/prf-files/{fileName}" : null,
                         Remarks = model.Remarks,
-                        Status = PRStatus.Pending,
+                        Status = PRStatus.PendingDepartmentHeadApproval,
                         SubmittedDate = DateTime.Now,
                         Items = model.Items?.Select(i => new PRItemModel
                         {
