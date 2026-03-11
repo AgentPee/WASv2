@@ -102,7 +102,7 @@ namespace WASv2.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> SubmitToDeptHead(PRFViewModel model, IFormFile prfFile)
+        public async Task<IActionResult> SubmitToDeptHead(PRFViewModel model, IFormFile? prfFile)
         {
             Console.WriteLine("=== SubmitToDeptHead Started ===");
             Console.WriteLine($"ModelState IsValid: {ModelState.IsValid}");
@@ -123,8 +123,11 @@ namespace WASv2.Controllers
                         Console.WriteLine($"File saved as: {fileName}");
                     }
 
+                    var existingPR = _prService.GetPRByNumber(model.PRNumber);
+
                     var prModel = new PRModel
                     {
+                        Id = existingPR?.Id ?? 0,
                         PRNumber = model.PRNumber,
                         Department = model.Department,
                         RequestDate = model.RequestDate,
@@ -154,34 +157,31 @@ namespace WASv2.Controllers
                     var savedPR = _prService.CreatePR(prModel);
                     Console.WriteLine($"CreatePR result: {(savedPR != null ? "Success" : "Failed")}");
 
+                    
+                    if (existingPR != null)
+                    {
+                        savedPR = _prService.UpdatePR(prModel);
+                        Console.WriteLine("PR updated.");
+                    }
+                    else
+                    {
+                        savedPR = _prService.CreatePR(prModel);
+                        Console.WriteLine("PR created.");
+                    }
+
                     if (savedPR != null)
                     {
-                        Console.WriteLine("PR saved successfully, redirecting...");
                         TempData["SuccessMessage"] = $"PR #{model.PRNumber} has been submitted to Department Head successfully!";
                         return RedirectToAction("Index");
                     }
                     else
                     {
-                        Console.WriteLine("CreatePR returned null");
                         ModelState.AddModelError("", "Failed to submit PR. Please try again.");
                     }
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"EXCEPTION: {ex.Message}");
-                    Console.WriteLine($"Stack Trace: {ex.StackTrace}");
-                    ModelState.AddModelError("", $"Error submitting PR: {ex.Message}");
-                }
-            }
-            else
-            {
-                Console.WriteLine("ModelState is invalid. Errors:");
-                foreach (var modelState in ModelState.Values)
-                {
-                    foreach (var error in modelState.Errors)
-                    {
-                        Console.WriteLine($"- {error.ErrorMessage}");
-                    }
+                    ModelState.AddModelError("", $"Error: {ex.Message}");
                 }
             }
 

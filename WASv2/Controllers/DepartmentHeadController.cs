@@ -81,7 +81,7 @@ namespace WASv2.Controllers
             {
                 TempData["ErrorMessage"] = $"Failed to approve PR #{prNumber}.";
             }
-            return RedirectToAction("PendingPR");
+            return RedirectToAction("Index");
         }
 
         [HttpPost]

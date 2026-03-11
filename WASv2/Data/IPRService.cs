@@ -9,6 +9,7 @@ namespace WASv2.Data
         PRModel GetPRByNumber(string prNumber);
         PRModel GetPRById(int id);
         PRModel CreatePR(PRModel prModel);
+        PRModel UpdatePR(PRModel prModel);
         bool ApprovePR(string prNumber, string reviewedBy, string remarks);
         bool DisapprovePR(string prNumber, string reviewedBy, string remarks);
         bool ForwardToProcurement(string prNumber);

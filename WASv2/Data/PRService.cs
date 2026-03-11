@@ -100,6 +100,7 @@ namespace WASv2.Data
         {
             return _context.PRs
                 .Include(p => p.Items)
+                .AsNoTracking()
                 .FirstOrDefault(p => p.PRNumber == prNumber);
         }
 
@@ -126,6 +127,29 @@ namespace WASv2.Data
                     Console.WriteLine($"Inner: {ex.InnerException.Message}");
                 throw;
             }
+        }
+
+        public PRModel UpdatePR(PRModel prModel)
+        {
+            var existing = _context.PRs
+        .Include(p => p.Items)
+        .FirstOrDefault(p => p.Id == prModel.Id);
+            if (existing == null) return null;
+
+            // Update scalar properties
+            _context.Entry(existing).CurrentValues.SetValues(prModel);
+
+            // Replace items: remove old, add new
+            _context.PRItems.RemoveRange(existing.Items);
+            foreach (var item in prModel.Items)
+            {
+                item.PRId = existing.Id;
+                item.Id = 0; // ensure new
+                existing.Items.Add(item);
+            }
+
+            _context.SaveChanges();
+            return existing;
         }
 
         public bool ApprovePR(string prNumber, string reviewedBy, string remarks)
