@@ -1,19 +1,26 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using WASv2.Data;
+using static WASv2.Models.PRStatus;
 using WASv2.Models;
 using WASv2.Services;
+using System.ComponentModel.DataAnnotations;
 
 namespace WASv2.Controllers
 {
     public class DepartmentHeadController : Controller
     {
         private readonly IPRService _prService;
+        private readonly ApplicationDbContext _context;
+        private readonly IWebHostEnvironment _hostEnvironment;
 
-        public DepartmentHeadController(IPRService prService)
+        public DepartmentHeadController(IPRService prService, ApplicationDbContext context, IWebHostEnvironment hostEnvironment)
         {
             _prService = prService;
+            _context = context;
+            _hostEnvironment = hostEnvironment;
         }
 
         public IActionResult Index()
@@ -69,19 +76,56 @@ namespace WASv2.Controllers
         }
 
         [HttpPost]
-        public IActionResult ApprovePR(string prNumber, string remarks)
+        public async Task<IActionResult> ApprovePR(string prNumber, string remarks, string reviewedBy)
         {
-            var reviewedBy = User.Identity.Name ?? "Department Head";
+            
             var result = _prService.DepartmentHeadApprovePR(prNumber, reviewedBy, remarks);
+
             if (result)
             {
                 TempData["SuccessMessage"] = $"PR #{prNumber} has been approved and forwarded to the Director.";
+                Console.WriteLine("PR approved and status updated to PendingDirectorApproval");
             }
             else
             {
-                TempData["ErrorMessage"] = $"Failed to approve PR #{prNumber}.";
+                TempData["ErrorMessage"] = $"Failed to approve PR #{prNumber}. PR may not be in pending status.";
+                Console.WriteLine("Failed to approve PR - either not found or wrong status");
             }
+
             return RedirectToAction("Index");
+
+            //var reviewedBy = User.Identity.Name ?? "Department Head";
+            //var result = _prService.DepartmentHeadApprovePR(prNumber, reviewedBy, remarks);
+            //if (result)
+            //{
+            //    TempData["SuccessMessage"] = $"PR #{prNumber} has been approved and forwarded to the Director.";
+            //}
+            //else
+            //{
+            //    TempData["ErrorMessage"] = $"Failed to approve PR #{prNumber}.";
+            //}
+
+
+            //var pr = _prService.GetPRByNumber(prNumber);
+            //var existingPR = _prService.GetPRByNumber(prNumber);
+            //if (pr != null && pr.Status == PRStatus.PendingDepartmentHeadApproval)
+            //{
+            //    Console.WriteLine("fetched PR");
+
+            //pr.Status = PRStatus.PendingDirectorApproval;
+            //    pr.Status = PRStatus.PendingDirectorApproval;
+            //    pr.ReviewedDate = DateTime.Now;
+            //    pr.ReviewedBy = reviewedBy;
+            //    pr.ApprovalRemarks = remarks;
+            //    _context.SaveChanges();
+            //return true;
+            //    Console.WriteLine("Updated Status");
+            //    return View("Index");
+            //}
+            //return false;
+            //Console.WriteLine("failed to save and update the PR");
+            //return View("Index");
+
         }
 
         [HttpPost]

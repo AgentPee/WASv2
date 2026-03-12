@@ -36,6 +36,7 @@ namespace WASv2.Data
             if (pr != null && pr.Status == PRStatus.PendingDepartmentHeadApproval)
             {
                 pr.Status = PRStatus.PendingDirectorApproval;
+                Console.WriteLine("succesfully updated the status");
                 pr.ReviewedDate = DateTime.Now;
                 pr.ReviewedBy = reviewedBy;
                 pr.ApprovalRemarks = remarks;
