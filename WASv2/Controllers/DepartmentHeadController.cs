@@ -84,12 +84,12 @@ namespace WASv2.Controllers
             if (result)
             {
                 TempData["SuccessMessage"] = $"PR #{prNumber} has been approved and forwarded to the Director.";
-                Console.WriteLine("PR approved and status updated to PendingDirectorApproval");
+                Console.WriteLine("============PR APPROVED AND STATUS UPDATED TO PENDING DIRECTOR APPROVAL============");
             }
             else
             {
                 TempData["ErrorMessage"] = $"Failed to approve PR #{prNumber}. PR may not be in pending status.";
-                Console.WriteLine("Failed to approve PR - either not found or wrong status");
+                Console.WriteLine("==========FAILED TO APPROVE PR============");
             }
 
             return RedirectToAction("Index");
