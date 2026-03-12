@@ -101,7 +101,7 @@ namespace WASv2.Data
         {
             return _context.PRs
                 .Include(p => p.Items)
-                .AsNoTracking()
+                //.AsNoTracking()
                 .FirstOrDefault(p => p.PRNumber == prNumber);
         }
 

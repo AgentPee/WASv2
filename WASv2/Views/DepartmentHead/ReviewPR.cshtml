@@ -120,7 +120,7 @@
                     <h5 class="mb-0"><i class="fa fa-check-circle me-2"></i>Approval Action</h5>
                 </div>
                 <div class="card-body">
-                    <form asp-controller="DepartmentHead" asp-action="ApprovePR" method="post" class="mb-3">
+                    <form asp-action="ApprovePR" method="post" class="mb-3">
                         <input type="hidden" name="prNumber" value="@Model.PRNumber" />
                         <div class="mb-3">
                             <label class="fw-bold">Approval Remarks (Optional)</label>
