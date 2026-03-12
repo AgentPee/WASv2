@@ -124,60 +124,78 @@ namespace WASv2.Controllers
                     }
 
                     var existingPR = _prService.GetPRByNumber(model.PRNumber);
+                    //Console.WriteLine($"existing PR is null {existingPR = null}");
+                    //if (existingPR != null) Console.WriteLine($"existingPR Id: {existingPR.Id}");
 
-                    var prModel = new PRModel
-                    {
-                        Id = existingPR?.Id ?? 0,
-                        PRNumber = model.PRNumber,
-                        Department = model.Department,
-                        RequestDate = model.RequestDate,
-                        RequestedBy = model.RequestedBy,
-                        RequestedById = GetCurrentUserId(),
-                        Purpose = model.Purpose,
-                        BudgetLine = model.BudgetLine,
-                        TotalAmount = model.TotalAmount,
-                        BudgetConfirmation = model.BudgetConfirmation,
-                        PRFFileName = fileName,
-                        PRFFilePath = $"/prf-files/{fileName}",
-                        Remarks = model.Remarks,
-                        Status = PRStatus.PendingDepartmentHeadApproval,
-                        SubmittedDate = DateTime.Now,
-                        Items = model.Items?.Select(i => new PRItemModel
-                        {
-                            ItemNo = i.ItemNo,
-                            Description = i.Description,
-                            Quantity = i.Quantity,
-                            Unit = i.Unit,
-                            UnitPrice = i.UnitPrice,
-                            TotalPrice = i.TotalPrice
-                        }).ToList() ?? new List<PRItemModel>()
-                    };
+                    var prModel = new PRModel();
+                    //var prModel = new PRModel
+                    //{
+                        //PRNumber = model.PRNumber,
+                        //Id = existingPR?.Id ?? 0,
+                        //Department = model.Department,
+                        //RequestDate = model.RequestDate,
+                        //RequestedBy = model.RequestedBy,
+                        //RequestedById = GetCurrentUserId(),
+                        //Purpose = model.Purpose,
+                        //BudgetLine = model.BudgetLine,
+                        //TotalAmount = model.TotalAmount,
+                        //BudgetConfirmation = model.BudgetConfirmation,
+                        //PRFFileName = fileName,
+                        //PRFFilePath = $"/prf-files/{fileName}",
+                        //Remarks = model.Remarks,
+                        //Status = PRStatus.PendingDepartmentHeadApproval,
+                        //SubmittedDate = DateTime.Now,
+                        //Items = model.Items?.Select(i => new PRItemModel
+                        //{
+                        //    ItemNo = i.ItemNo,
+                        //    Description = i.Description,
+                        //    Quantity = i.Quantity,
+                        //    Unit = i.Unit,
+                        //    UnitPrice = i.UnitPrice,
+                        //    TotalPrice = i.TotalPrice
+                        //}).ToList() ?? new List<PRItemModel>()
+                    //};
+                    
 
                     Console.WriteLine("Calling PRService.CreatePR...");
-                    var savedPR = _prService.CreatePR(prModel);
-                    Console.WriteLine($"CreatePR result: {(savedPR != null ? "Success" : "Failed")}");
+                    //var savedPR = _prService.CreatePR(prModel);
+                    //Console.WriteLine($"CreatePR result: {(savedPR != null ? "Success" : "Failed")}");
 
-                    
+                    Console.WriteLine($"existingPR is null? {existingPR == null}");
                     if (existingPR != null)
                     {
-                        savedPR = _prService.UpdatePR(prModel);
-                        Console.WriteLine("PR updated.");
+                        Console.WriteLine($"existingPR Id: {existingPR.Id}");
+                    }
+
+
+                    if (existingPR != null)
+                    {
+                        existingPR.Department = model.Department;
+                        existingPR.RequestDate = model.RequestDate;
+                        existingPR.RequestedBy = model.RequestedBy;
+                        existingPR.Purpose = model.Purpose;
+                        existingPR.BudgetLine = model.BudgetLine;
+                        existingPR.TotalAmount = model.TotalAmount;
+                        existingPR.BudgetConfirmation = model.BudgetConfirmation;
+                        existingPR.Remarks = model.Remarks;
+                        existingPR.Status = PRStatus.PendingDepartmentHeadApproval;
+                        existingPR.SubmittedDate = DateTime.Now;
                     }
                     else
                     {
-                        savedPR = _prService.CreatePR(prModel);
+                        _prService.CreatePR(prModel);
                         Console.WriteLine("PR created.");
                     }
 
-                    if (savedPR != null)
-                    {
-                        TempData["SuccessMessage"] = $"PR #{model.PRNumber} has been submitted to Department Head successfully!";
-                        return RedirectToAction("Index");
-                    }
-                    else
-                    {
-                        ModelState.AddModelError("", "Failed to submit PR. Please try again.");
-                    }
+                    //if (savedPR != null)
+                    //{
+                    //    TempData["SuccessMessage"] = $"PR #{model.PRNumber} has been submitted to Department Head successfully!";
+                    //    return RedirectToAction("Index");
+                    //}
+                    //else
+                    //{
+                    //    ModelState.AddModelError("", "Failed to submit PR. Please try again.");
+                    //}
                 }
                 catch (Exception ex)
                 {

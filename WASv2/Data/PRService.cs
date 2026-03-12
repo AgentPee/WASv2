@@ -113,20 +113,11 @@ namespace WASv2.Data
 
         public PRModel CreatePR(PRModel prModel)
         {
-            try
-            {
-                _context.PRs.Add(prModel);
-                int result = _context.SaveChanges();
-                Console.WriteLine($"SaveChanges result: {result}");
-                return result > 0 ? prModel : null;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"ERROR in CreatePR: {ex.Message}");
-                if (ex.InnerException != null)
-                    Console.WriteLine($"Inner: {ex.InnerException.Message}");
-                throw;
-            }
+            prModel.Status = PRStatus.PendingDepartmentHeadApproval;
+            prModel.SubmittedDate = DateTime.Now;
+            _context.PRs.Add(prModel);
+            _context.SaveChanges();
+            return prModel;
         }
 
         public PRModel UpdatePR(PRModel prModel)
@@ -136,15 +127,25 @@ namespace WASv2.Data
         .FirstOrDefault(p => p.Id == prModel.Id);
             if (existing == null) return null;
 
-            // Update scalar properties
-            _context.Entry(existing).CurrentValues.SetValues(prModel);
+            existing.Department = prModel.Department;
+            existing.RequestDate = prModel.RequestDate;
+            existing.RequestedBy = prModel.RequestedBy;
+            existing.Purpose = prModel.Purpose;
+            existing.BudgetLine = prModel.BudgetLine;
+            existing.TotalAmount = prModel.TotalAmount;
+            existing.BudgetConfirmation = prModel.BudgetConfirmation;
+            existing.PRFFileName = prModel.PRFFileName;
+            existing.PRFFilePath = prModel.PRFFilePath;
+            existing.Remarks = prModel.Remarks;
+            existing.Status = prModel.Status;
+            existing.SubmittedDate = prModel.SubmittedDate;
 
-            // Replace items: remove old, add new
             _context.PRItems.RemoveRange(existing.Items);
+
             foreach (var item in prModel.Items)
             {
+                item.Id = 0;
                 item.PRId = existing.Id;
-                item.Id = 0; // ensure new
                 existing.Items.Add(item);
             }
 
