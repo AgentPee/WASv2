@@ -1,4 +1,5 @@
 ﻿@model WASv2.Controllers.PRFViewModel
+@using WASv2.Models
 
 @{
     ViewData["Title"] = "Department Admin Staff - PRF Management";
@@ -120,6 +121,27 @@
                                     <p class="form-control-plaintext">@Model.Purpose</p>
                                 </div>
 
+                                @{
+                                    var prDetails = ViewBag.PRDetails as WASv2.Models.PRModel;
+                                }
+
+                                @if (prDetails != null)
+                                {
+                                    <!-- Display PR Details -->
+                                    <div class="card mt-4">
+                                        <div class="card-header bg-info text-white">
+                                            <h5>PR Details - @prDetails.PRNumber</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <p><strong>Department:</strong> @prDetails.Department</p>
+                                            <p><strong>Requested By:</strong> @prDetails.RequestedBy</p>
+                                            <p><strong>Purpose:</strong> @prDetails.Purpose</p>
+                                            <p><strong>Status:</strong> @prDetails.Status</p>
+                                            <!-- etc -->
+                                        </div>
+                                    </div>
+                                }
+
                                 <!-- Items Table -->
                                 @if (Model.Items != null && Model.Items.Any())
                                 {
@@ -204,40 +226,71 @@
         </div>
 
         
-        <!-- Recent Activity Sidebar
+        <!-- Recent Activity Sidebar -->
+        
         <div class="col-md-4">
-            <div class="card shadow">
-                <div class="card-header bg-secondary text-white">
-                    <i class="fa fa-history me-2"></i>Recent Activity
+            <div class="card shadow mb-4">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <span><i class="fa fa-clock me-2"></i>Recent PR Activity</span>
+                    <span class="badge bg-light text-dark">@(ViewBag.TotalPRs ?? 0) Total</span>
                 </div>
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <div>
-                            <span class="text-success"><i class="fa fa-check-circle me-2"></i>PR-2026-001</span>
-                            <br />
-                            <small class="text-muted">Approved by Head - 2 hours ago</small>
+                <div class="card-body p-0">
+                    @if (ViewBag.RecentPRs != null && ((List<PRModel>)ViewBag.RecentPRs).Any())
+                    {
+                        <ul class="list-group list-group-flush">
+                            @foreach (var pr in (List<PRModel>)ViewBag.RecentPRs)
+                            {
+                                <li class="list-group-item">
+                                    <a href="@Url.Action("PRDetails", new { prNumber = pr.PRNumber })" class="text-decoration-none text-dark">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <strong>@pr.PRNumber</strong>
+                                                <br />
+                                                <small class="text-muted">@pr.Purpose</small>
+                                            </div>
+                                            <div>
+                                                @switch (pr.Status)
+                                                {
+                                                    case var status when status == PRStatus.PendingDepartmentHeadApproval:
+                                                        <span class="badge bg-warning">Pending</span>
+                                                        break;
+                                                    case var status when status == PRStatus.ApprovedByDepartmentHead:
+                                                        <span class="badge bg-success">Approved</span>
+                                                        break;
+                                                    case var status when status == PRStatus.DisapprovedByDepartmentHead:
+                                                        <span class="badge bg-danger">Disapproved</span>
+                                                        break;
+                                                    case var status when status == PRStatus.PendingDirectorApproval:
+                                                        <span class="badge bg-info">With Director</span>
+                                                        break;
+                                                }
+                                            </div>
+                                        </div>
+                                    </a>
+                                    @if (!string.IsNullOrEmpty(pr.ApprovalRemarks))
+                                    {
+                                        <small class="text-muted d-block mt-1">
+                                            <i class="fa fa-comment me-1"></i>@pr.ApprovalRemarks
+                                        </small>
+                                    }
+                                    <small class="text-muted d-block mt-1">
+                                        <i class="fa fa-calendar me-1"></i>@pr.SubmittedDate.ToString("MMM dd, yyyy")
+                                    </small>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <div class="text-center p-3">
+                            <p class="text-muted mb-0">No recent PR activity</p>
                         </div>
-                        <span class="badge bg-success">Approved</span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <div>
-                            <span class="text-danger"><i class="fa fa-times-circle me-2"></i>PR-2026-002</span>
-                            <br />
-                            <small class="text-muted">Disapproved: Missing specs - Yesterday</small>
-                        </div>
-                        <span class="badge bg-danger">Rejected</span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <div>
-                            <span class="text-warning"><i class="fa fa-clock me-2"></i>PR-2026-003</span>
-                            <br />
-                            <small class="text-muted">Pending Head Approval - 3 days ago</small>
-                        </div>
-                        <span class="badge bg-warning">Pending</span>
-                    </li>
-                </ul>
+                    }
+                </div>
             </div>
-            -->
+        </div>
+        
+            
 
             <!-- Quick Stats
             <div class="card shadow mt-4">

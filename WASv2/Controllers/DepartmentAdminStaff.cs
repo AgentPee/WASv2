@@ -105,7 +105,7 @@ namespace WASv2.Controllers
         [HttpPost]
         public async Task<IActionResult> SubmitToDeptHead(PRFViewModel model, IFormFile? prfFile)
         {
-            Console.WriteLine("=== SubmitToDeptHead Started ===");
+            Console.WriteLine("============SUBMIT TO DEPT HEAD===========");
             Console.WriteLine($"ModelState IsValid: {ModelState.IsValid}");
             Console.WriteLine($"PR Number: {model.PRNumber}");
             Console.WriteLine($"File received: {(prfFile != null ? prfFile.FileName : "No file")}");
@@ -243,6 +243,44 @@ namespace WASv2.Controllers
             // In production, you should handle this better
             return 1;
         }
+
+        [HttpGet]
+        public IActionResult PRDetails(string prNumber)
+        {
+            if (string.IsNullOrEmpty(prNumber))
+            {
+                return RedirectToAction("Index");
+            }
+
+            var pr = _prService.GetPRByNumber(prNumber);
+            if (pr == null)
+            {
+                TempData["ErrorMessage"] = $"PR #{prNumber} not found.";
+                return RedirectToAction("Index");
+            }
+
+            var userDepartment = pr.Department;
+
+            var allDepartmentPRs = _prService.GetPRsByDepartment(userDepartment);
+
+            ViewBag.PendingCount = allDepartmentPRs.Count(p => p.Status == PRStatus.PendingDepartmentHeadApproval);
+            ViewBag.ApprovedCount = allDepartmentPRs.Count(p => p.Status == PRStatus.ApprovedByDepartmentHead);
+            ViewBag.DisapprovedCount = allDepartmentPRs.Count(p => p.Status == PRStatus.DisapprovedByDepartmentHead);
+            ViewBag.WithDirectorCount = allDepartmentPRs.Count(p => p.Status == PRStatus.PendingDirectorApproval);
+            ViewBag.TotalAmount = allDepartmentPRs.Sum(p => p.TotalAmount);
+            ViewBag.TotalPRs = allDepartmentPRs.Count;
+
+            ViewBag.RecentPRs = allDepartmentPRs
+                .Where(p => p.PRNumber != prNumber)
+                .OrderByDescending(p => p.SubmittedDate)
+                .Take(5)
+                .ToList();
+
+            ViewBag.PRDetails = pr;
+
+            return View("Index");
+        }
+
 
         private IActionResult GenerateSamplePRF(PRFViewModel prf)
         {
