@@ -172,7 +172,10 @@ namespace WASv2.Data
 
         public bool DisapprovePR(string prNumber, string reviewedBy, string remarks)
         {
-            var pr = GetPRByNumber(prNumber);
+            var pr = _context.PRs
+                .Include(p => p.Items)
+                .FirstOrDefault(p => p.PRNumber == prNumber);
+
             if (pr != null && pr.Status == PRStatus.PendingDepartmentHeadApproval)
             {
                 pr.Status = PRStatus.DisapprovedByDepartmentHead;

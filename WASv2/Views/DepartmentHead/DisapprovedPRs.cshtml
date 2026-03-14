@@ -1,0 +1,70 @@
+﻿@model List<WASv2.Models.PRModel>
+
+@{
+    ViewData["Title"] = "Disapproved Purchase Requests";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3">Disapproved Purchase Requests</h1>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="fa fa-arrow-left me-2"></i>Back to Dashboard
+        </a>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-header bg-danger text-white">
+            <h5 class="mb-0"><i class="fa fa-times-circle me-2"></i>Disapproved PRs</h5>
+        </div>
+        <div class="card-body">
+            @if (Model != null && Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>PR Number</th>
+                                <th>Department</th>
+                                <th>Requested By</th>
+                                <th>Purpose</th>
+                                <th>Total Amount</th>
+                                <th>Disapproved By</th>
+                                <th>Disapproved Date</th>
+                                <th>Remarks</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var pr in Model)
+                            {
+                                <tr>
+                                    <td><strong>@pr.PRNumber</strong></td>
+                                    <td>@pr.Department</td>
+                                    <td>@pr.RequestedBy</td>
+                                    <td>@pr.Purpose</td>
+                                    <td class="text-end">@pr.TotalAmount.ToString("C2")</td>
+                                    <td>@pr.ReviewedBy</td>
+                                    <td>@pr.ReviewedDate?.ToString("MMM dd, yyyy HH:mm")</td>
+                                    <td>
+                                        <span class="text-danger">@pr.ApprovalRemarks</span>
+                                    </td>
+                                    <td>
+                                        <a asp-action="ReviewPR" asp-route-prNumber="@pr.PRNumber" class="btn btn-sm btn-info">
+                                            <i class="fa fa-eye me-1"></i>View
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info mb-0">
+                    <i class="fa fa-info-circle me-2"></i>No disapproved purchase requests found.
+                </div>
+            }
+        </div>
+    </div>
+</div>

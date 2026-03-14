@@ -60,18 +60,13 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card bg-danger text-white shadow">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-danger shadow h-100 py-2">
                 <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="col-3">
-                            <i class="fa fa-times-circle fa-3x"></i>
-                        </div>
-                        <div class="col-9 text-end">
-                            <h5 class="card-title mb-1">Disapproved</h5>
-                            <h2 class="mb-0">@Model.TotalDisapproved</h2>
-                        </div>
-                    </div>
+                    <a asp-action="DisapprovedPRs" class="text-decoration-none">
+                        <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Disapproved PRs</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">@ViewBag.DisapprovedCount</div>
+                    </a>
                 </div>
             </div>
         </div>

@@ -131,19 +131,51 @@ namespace WASv2.Controllers
         [HttpPost]
         public IActionResult DisapprovePR(string prNumber, string remarks)
         {
-            var reviewedBy = User.Identity.Name ?? "Department Head";
-            var result = _prService.DisapprovePR(prNumber, reviewedBy, remarks);
-
-            if (result)
+            try
             {
-                TempData["SuccessMessage"] = $"PR #{prNumber} has been disapproved.";
+                var reviewedBy = User.Identity.Name ?? "Department Head";
+
+                var pr = _prService.GetPRByNumber(prNumber);
+
+                if (pr == null)
+                {
+                    TempData["ErrorMessage"] = $"PR #{prNumber} not found.";
+                    return RedirectToAction("Index");
+                }
+
+                var requestorId = pr.RequestedById;
+                var requestorName = pr.RequestedBy;
+
+                var result = _prService.DisapprovePR(prNumber, reviewedBy, remarks);
+
+                if (result)
+                {
+                    Console.WriteLine($"PR #{prNumber} disapproved by {reviewedBy}. Remarks: {remarks}");
+
+                    
+                    TempData["SuccessMessage"] = $"PR #{prNumber} has been disapproved. The requestor ({requestorName}) has been notified.";
+
+                    return RedirectToAction("DisapprovedPRs");
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = $"Failed to disapprove PR #{prNumber}. The PR may not be in a pending state.";
+                }
             }
-            else
+            catch (Exception ex)
             {
-                TempData["ErrorMessage"] = $"Failed to disapprove PR #{prNumber}.";
+                Console.WriteLine($"Error disapproving PR: {ex.Message}");
+                TempData["ErrorMessage"] = $"An error occurred while disapproving the PR.";
             }
 
-            return RedirectToAction("PendingPR");
+            return RedirectToAction("Index");
+        }
+
+        [HttpGet]
+        public IActionResult DisapprovedPRs()
+        {
+            var disapprovedPRs = _prService.GetPRsByStatus(PRStatus.DisapprovedByDepartmentHead);
+            return View(disapprovedPRs);
         }
 
         public IActionResult PaymentMemoReview()

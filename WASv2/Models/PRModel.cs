@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using WASv2.Controllers;
 
 namespace WASv2.Models
 {
@@ -64,6 +65,7 @@ namespace WASv2.Models
         public string? ApprovalRemarks { get; set; }
 
         public List<PRItemModel> Items { get; set; }
+        
     }
 
     public class PRItemModel
