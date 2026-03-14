@@ -36,13 +36,14 @@ namespace WASv2.Data
             if (pr != null && pr.Status == PRStatus.PendingDepartmentHeadApproval)
             {
                 pr.Status = PRStatus.PendingDirectorApproval;
-                Console.WriteLine("==========SUCCESSFULLY UPDATED THE STATUS============");
                 pr.ReviewedDate = DateTime.Now;
                 pr.ReviewedBy = reviewedBy;
                 pr.ApprovalRemarks = remarks;
                 _context.SaveChanges();
+                Console.WriteLine($"==========PR #{prNumber} STATUS UPDATED TO PendingDirectorApproval============");
                 return true;
             }
+            Console.WriteLine($"==========FAILED: PR #{prNumber} status is '{pr?.Status}', expected '{PRStatus.PendingDepartmentHeadApproval}'============");
             return false;
         }
 
@@ -51,7 +52,7 @@ namespace WASv2.Data
             return _context.PRs
                 .Include(p => p.Items)
                 .Where(p => p.Status == PRStatus.PendingDirectorApproval)
-                .OrderByDescending(p => p.SubmittedDate)
+                .OrderByDescending(p => p.ReviewedDate) // Show most recently dept-head-approved first
                 .ToList();
         }
 
@@ -154,21 +155,9 @@ namespace WASv2.Data
             return existing;
         }
 
-        public bool ApprovePR(string prNumber, string reviewedBy, string remarks)
-        {
-            var pr = GetPRByNumber(prNumber);
-            if (pr != null && pr.Status == PRStatus.PendingDepartmentHeadApproval)
-            {
-                pr.Status = PRStatus.ApprovedByDepartmentHead;
-                pr.ReviewedDate = DateTime.Now;
-                pr.ReviewedBy = reviewedBy;
-                pr.ApprovalRemarks = remarks;
-
-                _context.SaveChanges();
-                return true;
-            }
-            return false;
-        }
+        // NOTE: Use DepartmentHeadApprovePR instead — it correctly sets PendingDirectorApproval
+        // to forward the PR directly to the Director queue.
+        // ApprovedByDepartmentHead is a terminal status not used in the approval flow.
 
         public bool DisapprovePR(string prNumber, string reviewedBy, string remarks)
         {

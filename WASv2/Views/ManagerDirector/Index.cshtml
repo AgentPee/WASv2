@@ -33,6 +33,21 @@
     </div>
 </div>
 
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
 <div class="card shadow">
     <div class="card-header py-3">
         <h6 class="m-0 font-weight-bold text-primary">Pending Purchase Requisitions</h6>
@@ -46,10 +61,18 @@
                     <th>Purpose</th>
                     <th>Total Amount</th>
                     <th>Budget Impact</th>
+                    <th>Approved by Dept Head</th>
+                    <th>Dept Head Approval Date</th>
                     <th class="text-center">Action</th>
                 </tr>
             </thead>
             <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-4">No pending PRs awaiting Director approval.</td>
+                    </tr>
+                }
                 @foreach (var pr in Model)
                 {
                     <tr>
@@ -60,11 +83,31 @@
                         <td>
                             @if (pr.TotalAmount > 100000)
                             {
-                                <span class="text-danger font-weight-bold">High</span>
+                                <span class="badge bg-danger">High</span>
                             }
                             else
                             {
-                                <span class="text-success">Normal</span>
+                                <span class="badge bg-success">Normal</span>
+                            }
+                        </td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(pr.ReviewedBy))
+                            {
+                                <span class="text-muted small"><i class="bi bi-person-check"></i> @pr.ReviewedBy</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted small">—</span>
+                            }
+                        </td>
+                        <td>
+                            @if (pr.ReviewedDate.HasValue)
+                            {
+                                <span class="text-muted small">@pr.ReviewedDate.Value.ToString("MM/dd/yyyy hh:mm tt")</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted small">—</span>
                             }
                         </td>
                         <td class="text-center">

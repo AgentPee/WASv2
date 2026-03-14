@@ -78,54 +78,25 @@ namespace WASv2.Controllers
         [HttpPost]
         public async Task<IActionResult> ApprovePR(string prNumber, string remarks, string reviewedBy)
         {
-            
-            var result = _prService.DepartmentHeadApprovePR(prNumber, reviewedBy, remarks);
+            // Fall back to identity name if reviewedBy not passed from form
+            var approver = !string.IsNullOrEmpty(reviewedBy)
+                ? reviewedBy
+                : (User.Identity?.Name ?? "Department Head");
+
+            var result = _prService.DepartmentHeadApprovePR(prNumber, approver, remarks);
 
             if (result)
             {
                 TempData["SuccessMessage"] = $"PR #{prNumber} has been approved and forwarded to the Director.";
-                Console.WriteLine("============PR APPROVED AND STATUS UPDATED TO PENDING DIRECTOR APPROVAL============");
+                Console.WriteLine($"============PR #{prNumber} APPROVED BY {approver} AND FORWARDED TO DIRECTOR============");
             }
             else
             {
                 TempData["ErrorMessage"] = $"Failed to approve PR #{prNumber}. PR may not be in pending status.";
-                Console.WriteLine("==========FAILED TO APPROVE PR============");
+                Console.WriteLine($"==========FAILED TO APPROVE PR #{prNumber}============");
             }
 
             return RedirectToAction("Index");
-
-            //var reviewedBy = User.Identity.Name ?? "Department Head";
-            //var result = _prService.DepartmentHeadApprovePR(prNumber, reviewedBy, remarks);
-            //if (result)
-            //{
-            //    TempData["SuccessMessage"] = $"PR #{prNumber} has been approved and forwarded to the Director.";
-            //}
-            //else
-            //{
-            //    TempData["ErrorMessage"] = $"Failed to approve PR #{prNumber}.";
-            //}
-
-
-            //var pr = _prService.GetPRByNumber(prNumber);
-            //var existingPR = _prService.GetPRByNumber(prNumber);
-            //if (pr != null && pr.Status == PRStatus.PendingDepartmentHeadApproval)
-            //{
-            //    Console.WriteLine("fetched PR");
-
-            //pr.Status = PRStatus.PendingDirectorApproval;
-            //    pr.Status = PRStatus.PendingDirectorApproval;
-            //    pr.ReviewedDate = DateTime.Now;
-            //    pr.ReviewedBy = reviewedBy;
-            //    pr.ApprovalRemarks = remarks;
-            //    _context.SaveChanges();
-            //return true;
-            //    Console.WriteLine("Updated Status");
-            //    return View("Index");
-            //}
-            //return false;
-            //Console.WriteLine("failed to save and update the PR");
-            //return View("Index");
-
         }
 
         [HttpPost]
@@ -152,7 +123,7 @@ namespace WASv2.Controllers
                 {
                     Console.WriteLine($"PR #{prNumber} disapproved by {reviewedBy}. Remarks: {remarks}");
 
-                    
+
                     TempData["SuccessMessage"] = $"PR #{prNumber} has been disapproved. The requestor ({requestorName}) has been notified.";
 
                     return RedirectToAction("DisapprovedPRs");
@@ -197,13 +168,13 @@ namespace WASv2.Controllers
                 return NotFound();
             }
 
-            
+
             //For demo purposes, create a simple text file
             string content = GeneratePRFContent(pr);
             byte[] fileBytes = System.Text.Encoding.UTF8.GetBytes(content);
 
             return File(fileBytes, "text/plain", $"PRF_{pr.PRNumber}.txt");
-            
+
         }
 
         [HttpPost]
@@ -237,15 +208,15 @@ namespace WASv2.Controllers
             ITEMS:
             --------------------------------------------------
             ";
-                        foreach (var item in pr.Items)
-                        {
-                            content += $"{item.ItemNo}. {item.Description}\n";
-                            content += $"   Quantity: {item.Quantity} {item.Unit}\n";
-                            content += $"   Unit Price: {item.UnitPrice:C2}\n";
-                            content += $"   Total: {item.TotalPrice:C2}\n\n";
-                        }
+            foreach (var item in pr.Items)
+            {
+                content += $"{item.ItemNo}. {item.Description}\n";
+                content += $"   Quantity: {item.Quantity} {item.Unit}\n";
+                content += $"   Unit Price: {item.UnitPrice:C2}\n";
+                content += $"   Total: {item.TotalPrice:C2}\n\n";
+            }
 
-                        content += $@"
+            content += $@"
             --------------------------------------------------
             TOTAL AMOUNT: {pr.TotalAmount:C2}
 
