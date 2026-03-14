@@ -31,6 +31,11 @@ namespace WASv2.Controllers
                 IsSearched = false,
                 BudgetConfirmation = "Confirmed (Stock Replenishment)"
             };
+
+            // Pass approved/disapproved PRs to view
+            ViewBag.ApprovedPRs = _prService.GetPRsByStatus(PRStatus.ApprovedByDepartmentHead);
+            ViewBag.DisapprovedPRs = _prService.GetPRsByStatus(PRStatus.DisapprovedByDepartmentHead);
+
             return View(model);
         }
 
@@ -70,6 +75,10 @@ namespace WASv2.Controllers
                 ModelState.AddModelError("PRNumber", "PR Number not found");
             }
 
+            // Re-populate ViewBag so sidebar still renders after search
+            ViewBag.ApprovedPRs = _prService.GetPRsByStatus(PRStatus.ApprovedByDepartmentHead);
+            ViewBag.DisapprovedPRs = _prService.GetPRsByStatus(PRStatus.DisapprovedByDepartmentHead);
+
             return View("Index", model);
         }
 
@@ -91,7 +100,6 @@ namespace WASv2.Controllers
             string uploadsFolder = Path.Combine(_hostEnvironment.WebRootPath, "prf-files");
             string filePath = Path.Combine(uploadsFolder, prf.PRFFileName);
 
-            // If file doesn't exist, generate a sample file (for demo purposes)
             if (!System.IO.File.Exists(filePath))
             {
                 return GenerateSamplePRF(prf);
@@ -125,49 +133,16 @@ namespace WASv2.Controllers
                     }
 
                     var existingPR = _prService.GetPRByNumber(model.PRNumber);
-                    //Console.WriteLine($"existing PR is null {existingPR = null}");
-                    //if (existingPR != null) Console.WriteLine($"existingPR Id: {existingPR.Id}");
 
                     var prModel = new PRModel();
-                    //var prModel = new PRModel
-                    //{
-                        //PRNumber = model.PRNumber,
-                        //Id = existingPR?.Id ?? 0,
-                        //Department = model.Department,
-                        //RequestDate = model.RequestDate,
-                        //RequestedBy = model.RequestedBy,
-                        //RequestedById = GetCurrentUserId(),
-                        //Purpose = model.Purpose,
-                        //BudgetLine = model.BudgetLine,
-                        //TotalAmount = model.TotalAmount,
-                        //BudgetConfirmation = model.BudgetConfirmation,
-                        //PRFFileName = fileName,
-                        //PRFFilePath = $"/prf-files/{fileName}",
-                        //Remarks = model.Remarks,
-                        //Status = PRStatus.PendingDepartmentHeadApproval,
-                        //SubmittedDate = DateTime.Now,
-                        //Items = model.Items?.Select(i => new PRItemModel
-                        //{
-                        //    ItemNo = i.ItemNo,
-                        //    Description = i.Description,
-                        //    Quantity = i.Quantity,
-                        //    Unit = i.Unit,
-                        //    UnitPrice = i.UnitPrice,
-                        //    TotalPrice = i.TotalPrice
-                        //}).ToList() ?? new List<PRItemModel>()
-                    //};
-                    
 
                     Console.WriteLine("Calling PRService.CreatePR...");
-                    //var savedPR = _prService.CreatePR(prModel);
-                    //Console.WriteLine($"CreatePR result: {(savedPR != null ? "Success" : "Failed")}");
 
                     Console.WriteLine($"existingPR is null? {existingPR == null}");
                     if (existingPR != null)
                     {
                         Console.WriteLine($"existingPR Id: {existingPR.Id}");
                     }
-
 
                     if (existingPR != null)
                     {
@@ -188,220 +163,20 @@ namespace WASv2.Controllers
                         Console.WriteLine("PR created.");
                     }
 
-                    //if (savedPR != null)
-                    //{
-                    //    TempData["SuccessMessage"] = $"PR #{model.PRNumber} has been submitted to Department Head successfully!";
-                    //    return RedirectToAction("Index");
-                    //}
-                    //else
-                    //{
-                    //    ModelState.AddModelError("", "Failed to submit PR. Please try again.");
-                    //}
+                    TempData["SuccessMessage"] = $"PR #{model.PRNumber} submitted to Department Head successfully!";
+                    return RedirectToAction("Index");
                 }
                 catch (Exception ex)
                 {
-                    ModelState.AddModelError("", $"Error: {ex.Message}");
+                    ModelState.AddModelError("", $"Error submitting PR: {ex.Message}");
                 }
             }
 
-            Console.WriteLine("Returning to Index view");
-            model.IsSearched = true;
-            model.IsFound = true;
+            ViewBag.ApprovedPRs = _prService.GetPRsByStatus(PRStatus.ApprovedByDepartmentHead);
+            ViewBag.DisapprovedPRs = _prService.GetPRsByStatus(PRStatus.DisapprovedByDepartmentHead);
+
             return View("Index", model);
         }
-
-        private async Task<string> SavePRFFile(IFormFile file, string prNumber)
-        {
-            string uploadsFolder = Path.Combine(_hostEnvironment.WebRootPath, "prf-files");
-
-            if (!Directory.Exists(uploadsFolder))
-            {
-                Directory.CreateDirectory(uploadsFolder);
-            }
-
-            string fileExtension = Path.GetExtension(file.FileName);
-            string fileName = $"PRF_{prNumber}_{DateTime.Now:yyyyMMddHHmmss}{fileExtension}";
-            string filePath = Path.Combine(uploadsFolder, fileName);
-
-            using (var fileStream = new FileStream(filePath, FileMode.Create))
-            {
-                await file.CopyToAsync(fileStream);
-            }
-
-            return fileName;
-        }
-
-        private int GetCurrentUserId()
-        {
-            // You'll need to set this up based on your authentication
-            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "UserId");
-            if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int userId))
-            {
-                return userId;
-            }
-
-            // In production, you should handle this better
-            return 1;
-        }
-
-        [HttpGet]
-        public IActionResult PRDetails(string prNumber)
-        {
-            if (string.IsNullOrEmpty(prNumber))
-            {
-                return RedirectToAction("Index");
-            }
-
-            var pr = _prService.GetPRByNumber(prNumber);
-            if (pr == null)
-            {
-                TempData["ErrorMessage"] = $"PR #{prNumber} not found.";
-                return RedirectToAction("Index");
-            }
-
-            var userDepartment = pr.Department;
-
-            var allDepartmentPRs = _prService.GetPRsByDepartment(userDepartment);
-
-            ViewBag.PendingCount = allDepartmentPRs.Count(p => p.Status == PRStatus.PendingDepartmentHeadApproval);
-            ViewBag.ApprovedCount = allDepartmentPRs.Count(p => p.Status == PRStatus.ApprovedByDepartmentHead);
-            ViewBag.DisapprovedCount = allDepartmentPRs.Count(p => p.Status == PRStatus.DisapprovedByDepartmentHead);
-            ViewBag.WithDirectorCount = allDepartmentPRs.Count(p => p.Status == PRStatus.PendingDirectorApproval);
-            ViewBag.TotalAmount = allDepartmentPRs.Sum(p => p.TotalAmount);
-            ViewBag.TotalPRs = allDepartmentPRs.Count;
-
-            ViewBag.RecentPRs = allDepartmentPRs
-                .Where(p => p.PRNumber != prNumber)
-                .OrderByDescending(p => p.SubmittedDate)
-                .Take(5)
-                .ToList();
-
-            ViewBag.PRDetails = pr;
-
-            return View("Index");
-        }
-
-
-        private IActionResult GenerateSamplePRF(PRFViewModel prf)
-        {
-            string content = $@"
-            PRF NUMBER: {prf.PRNumber}
-            DATE: {prf.RequestDate:MM/dd/yyyy}
-            DEPARTMENT: {prf.Department}
-            REQUESTED BY: {prf.RequestedBy}
-            PURPOSE: {prf.Purpose}
-            BUDGET LINE: {prf.BudgetLine}
-            BUDGET CONFIRMATION: {prf.BudgetConfirmation}
-
-            ITEMS:
-            --------------------------------------------------\n";
-
-                        foreach (var item in prf.Items)
-                        {
-                            content += $"{item.ItemNo}. {item.Description} - {item.Quantity} {item.Unit} @ {item.UnitPrice:C2} = {item.TotalPrice:C2}\n";
-                        }
-
-                        content += $@"
-            --------------------------------------------------
-            TOTAL AMOUNT: {prf.TotalAmount:C2}
-
-            REMARKS: {prf.Remarks}
-            ";
-
-            byte[] fileBytes = System.Text.Encoding.UTF8.GetBytes(content);
-            return File(fileBytes, "text/plain", $"PRF_{prf.PRNumber}.txt");
-        }
-
-        private string GetContentType(string filePath)
-        {
-            string extension = Path.GetExtension(filePath).ToLowerInvariant();
-            return extension switch
-            {
-                ".pdf" => "application/pdf",
-                ".jpg" or ".jpeg" => "image/jpeg",
-                ".png" => "image/png",
-                ".txt" => "text/plain",
-                ".doc" => "application/msword",
-                ".docx" => "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                _ => "application/octet-stream"
-            };
-        }
-
-        private PRFViewModel GetPRFByNumber(string prNumber)
-        {
-            // First check if this PR already exists in the system using the service
-            var existingPR = _prService.GetPRByNumber(prNumber);
-            if (existingPR != null)
-            {
-                return new PRFViewModel
-                {
-                    PRNumber = existingPR.PRNumber,
-                    Department = existingPR.Department,
-                    RequestDate = existingPR.RequestDate,
-                    RequestedBy = existingPR.RequestedBy,
-                    Purpose = existingPR.Purpose,
-                    BudgetLine = existingPR.BudgetLine,
-                    TotalAmount = existingPR.TotalAmount,
-                    BudgetConfirmation = existingPR.BudgetConfirmation,
-                    PRFFileName = existingPR.PRFFileName,
-                    Remarks = existingPR.Remarks,
-                    Items = existingPR.Items?.Select(i => new PRFItemViewModel
-                    {
-                        ItemNo = i.ItemNo,
-                        Description = i.Description,
-                        Quantity = i.Quantity,
-                        Unit = i.Unit,
-                        UnitPrice = i.UnitPrice,
-                        TotalPrice = i.TotalPrice
-                    }).ToList()
-                };
-            }
-
-            // If not found in database, use sample data (for demo/pre-population)
-            var samplePRFs = new Dictionary<string, PRFViewModel>
-            {
-                ["PR-2026-001"] = new PRFViewModel
-                {
-                    PRNumber = "PR-2026-001",
-                    Department = "Information Technology",
-                    RequestDate = DateTime.Now.AddDays(-5),
-                    RequestedBy = "John Doe",
-                    Purpose = "Hardware Replacement for Q2",
-                    BudgetLine = "IT Equipment - CAPEX",
-                    TotalAmount = 500000.00M,
-                    BudgetConfirmation = "Confirmed (Stock Replenishment)",
-                    PRFFileName = "PR-2026-001_Hardware_Request.pdf",
-                    Remarks = "Urgent: Need for new developers",
-                    Items = new List<PRFItemViewModel>
-                    {
-                        new PRFItemViewModel { ItemNo = 1, Description = "Dell XPS Laptops", Quantity = 5, Unit = "pcs", UnitPrice = 85000.00M, TotalPrice = 425000.00M },
-                        new PRFItemViewModel { ItemNo = 2, Description = "Dell Monitors 27\"", Quantity = 5, Unit = "pcs", UnitPrice = 15000.00M, TotalPrice = 75000.00M }
-                    }
-                },
-                ["PR-2026-002"] = new PRFViewModel
-                {
-                    PRNumber = "PR-2026-002",
-                    Department = "Human Resources",
-                    RequestDate = DateTime.Now.AddDays(-3),
-                    RequestedBy = "Jane Smith",
-                    Purpose = "Training Materials",
-                    BudgetLine = "Training - OPEX",
-                    TotalAmount = 50000.00M,
-                    BudgetConfirmation = "Subject for Approval",
-                    PRFFileName = "PR-2026-002_Training_Materials.pdf",
-                    Remarks = "For Q2 Training",
-                    Items = new List<PRFItemViewModel>
-                    {
-                        new PRFItemViewModel { ItemNo = 1, Description = "Training Manuals", Quantity = 50, Unit = "pcs", UnitPrice = 500.00M, TotalPrice = 25000.00M },
-                        new PRFItemViewModel { ItemNo = 2, Description = "Training Kits", Quantity = 50, Unit = "sets", UnitPrice = 500.00M, TotalPrice = 25000.00M }
-                    }
-                }
-            };
-
-            return samplePRFs.ContainsKey(prNumber) ? samplePRFs[prNumber] : null;
-            
-        }
-
 
         public IActionResult CreatePR()
         {
@@ -433,7 +208,6 @@ namespace WASv2.Controllers
                 Console.WriteLine("Items is null");
             }
 
-            // Also log ModelState errors
             if (!ModelState.IsValid)
             {
                 foreach (var key in ModelState.Keys)
@@ -471,7 +245,7 @@ namespace WASv2.Controllers
                         Department = model.Department,
                         RequestDate = model.RequestDate,
                         RequestedBy = model.RequestedBy,
-                        RequestedById = GetCurrentUserId(),
+                        //RequestedById = GetCurrentUserId(),
                         Purpose = model.Purpose,
                         BudgetLine = model.BudgetLine,
                         TotalAmount = totalAmount,
@@ -513,7 +287,68 @@ namespace WASv2.Controllers
             return View(model);
         }
 
+        // ── helpers (unchanged) ─────────────────────────────────────────────
 
+        private string GetCurrentUserId() => User?.Identity?.Name ?? "Unknown";
+
+        private async Task<string> SavePRFFile(IFormFile file, string prNumber)
+        {
+            string uploadsFolder = Path.Combine(_hostEnvironment.WebRootPath, "prf-files");
+            Directory.CreateDirectory(uploadsFolder);
+            string fileName = $"{prNumber}_{Path.GetFileName(file.FileName)}";
+            string filePath = Path.Combine(uploadsFolder, fileName);
+            using var stream = new FileStream(filePath, FileMode.Create);
+            await file.CopyToAsync(stream);
+            return fileName;
+        }
+
+        private string GetContentType(string filePath)
+        {
+            var ext = Path.GetExtension(filePath).ToLowerInvariant();
+            return ext switch
+            {
+                ".pdf" => "application/pdf",
+                ".jpg" or ".jpeg" => "image/jpeg",
+                ".png" => "image/png",
+                _ => "application/octet-stream"
+            };
+        }
+
+        private IActionResult GenerateSamplePRF(PRFViewModel prf)
+        {
+            string content = $"PR Number: {prf.PRNumber}\nDepartment: {prf.Department}\nRequested By: {prf.RequestedBy}";
+            byte[] bytes = System.Text.Encoding.UTF8.GetBytes(content);
+            return File(bytes, "text/plain", $"PRF_{prf.PRNumber}.txt");
+        }
+
+        private PRFViewModel GetPRFByNumber(string prNumber)
+        {
+            var pr = _prService.GetPRByNumber(prNumber);
+            if (pr == null) return null;
+
+            return new PRFViewModel
+            {
+                PRNumber = pr.PRNumber,
+                Department = pr.Department,
+                RequestDate = pr.RequestDate,
+                RequestedBy = pr.RequestedBy,
+                Purpose = pr.Purpose,
+                BudgetLine = pr.BudgetLine,
+                TotalAmount = pr.TotalAmount,
+                BudgetConfirmation = pr.BudgetConfirmation,
+                PRFFileName = pr.PRFFileName,
+                Remarks = pr.Remarks,
+                Items = pr.Items?.Select(i => new PRFItemViewModel
+                {
+                    ItemNo = i.ItemNo,
+                    Description = i.Description,
+                    Quantity = i.Quantity,
+                    Unit = i.Unit,
+                    UnitPrice = i.UnitPrice,
+                    TotalPrice = i.TotalPrice
+                }).ToList() ?? new List<PRFItemViewModel>()
+            };
+        }
     }
 
     public class PRFViewModel

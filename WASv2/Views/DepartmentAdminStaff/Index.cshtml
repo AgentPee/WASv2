@@ -22,6 +22,7 @@
     }
 
     <div class="row">
+        <!-- ── LEFT: Search + PRF Details ───────────────────────────────── -->
         <div class="col-md-8">
             <!-- PR Number Search Card -->
             <div class="card shadow mb-4">
@@ -121,27 +122,6 @@
                                     <p class="form-control-plaintext">@Model.Purpose</p>
                                 </div>
 
-                                @{
-                                    var prDetails = ViewBag.PRDetails as WASv2.Models.PRModel;
-                                }
-
-                                @if (prDetails != null)
-                                {
-                                    <!-- Display PR Details -->
-                                    <div class="card mt-4">
-                                        <div class="card-header bg-info text-white">
-                                            <h5>PR Details - @prDetails.PRNumber</h5>
-                                        </div>
-                                        <div class="card-body">
-                                            <p><strong>Department:</strong> @prDetails.Department</p>
-                                            <p><strong>Requested By:</strong> @prDetails.RequestedBy</p>
-                                            <p><strong>Purpose:</strong> @prDetails.Purpose</p>
-                                            <p><strong>Status:</strong> @prDetails.Status</p>
-                                            <!-- etc -->
-                                        </div>
-                                    </div>
-                                }
-
                                 <!-- Items Table -->
                                 @if (Model.Items != null && Model.Items.Any())
                                 {
@@ -225,23 +205,32 @@
             }
         </div>
 
-        
-        <!-- Recent Activity Sidebar -->
-        
+        <!-- ── RIGHT: Sidebar ───────────────────────────────────────────── -->
         <div class="col-md-4">
+
+            <!-- ── Recent PR Activity (collapsible) ─────────────────────── -->
             <div class="card shadow mb-4">
-                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center"
+                     role="button"
+                     data-bs-toggle="collapse"
+                     data-bs-target="#collapseRecentActivity"
+                     aria-expanded="true"
+                     aria-controls="collapseRecentActivity"
+                     style="cursor:pointer; user-select:none;">
                     <span><i class="fa fa-clock me-2"></i>Recent PR Activity</span>
-                    <span class="badge bg-light text-dark">@(ViewBag.TotalPRs ?? 0) Total</span>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge bg-light text-dark">@(ViewBag.TotalPRs ?? 0) Total</span>
+                        <i class="fa fa-chevron-up collapse-chevron transition-icon"></i>
+                    </div>
                 </div>
-                <div class="card-body p-0">
-                    @if (ViewBag.RecentPRs != null && ((List<PRModel>)ViewBag.RecentPRs).Any())
-                    {
-                        <ul class="list-group list-group-flush">
-                            @foreach (var pr in (List<PRModel>)ViewBag.RecentPRs)
-                            {
-                                <li class="list-group-item">
-                                    <a href="@Url.Action("PRDetails", new { prNumber = pr.PRNumber })" class="text-decoration-none text-dark">
+                <div id="collapseRecentActivity" class="collapse show">
+                    <div class="card-body p-0">
+                        @if (ViewBag.RecentPRs != null && ((List<PRModel>)ViewBag.RecentPRs).Any())
+                        {
+                            <ul class="list-group list-group-flush">
+                                @foreach (var pr in (List<PRModel>)ViewBag.RecentPRs)
+                                {
+                                    <li class="list-group-item">
                                         <div class="d-flex justify-content-between align-items-start">
                                             <div>
                                                 <strong>@pr.PRNumber</strong>
@@ -251,88 +240,211 @@
                                             <div>
                                                 @switch (pr.Status)
                                                 {
-                                                    case var status when status == PRStatus.PendingDepartmentHeadApproval:
+                                                    case var s when s == PRStatus.PendingDepartmentHeadApproval:
                                                         <span class="badge bg-warning">Pending</span>
                                                         break;
-                                                    case var status when status == PRStatus.ApprovedByDepartmentHead:
+                                                    case var s when s == PRStatus.ApprovedByDepartmentHead:
                                                         <span class="badge bg-success">Approved</span>
                                                         break;
-                                                    case var status when status == PRStatus.DisapprovedByDepartmentHead:
+                                                    case var s when s == PRStatus.DisapprovedByDepartmentHead:
                                                         <span class="badge bg-danger">Disapproved</span>
                                                         break;
-                                                    case var status when status == PRStatus.PendingDirectorApproval:
+                                                    case var s when s == PRStatus.PendingDirectorApproval:
                                                         <span class="badge bg-info">With Director</span>
                                                         break;
                                                 }
                                             </div>
                                         </div>
-                                    </a>
-                                    @if (!string.IsNullOrEmpty(pr.ApprovalRemarks))
-                                    {
+                                        @if (!string.IsNullOrEmpty(pr.ApprovalRemarks))
+                                        {
+                                            <small class="text-muted d-block mt-1">
+                                                <i class="fa fa-comment me-1"></i>@pr.ApprovalRemarks
+                                            </small>
+                                        }
                                         <small class="text-muted d-block mt-1">
-                                            <i class="fa fa-comment me-1"></i>@pr.ApprovalRemarks
+                                            <i class="fa fa-calendar me-1"></i>@pr.SubmittedDate.ToString("MMM dd, yyyy")
                                         </small>
-                                    }
-                                    <small class="text-muted d-block mt-1">
-                                        <i class="fa fa-calendar me-1"></i>@pr.SubmittedDate.ToString("MMM dd, yyyy")
-                                    </small>
-                                </li>
-                            }
-                        </ul>
-                    }
-                    else
-                    {
-                        <div class="text-center p-3">
-                            <p class="text-muted mb-0">No recent PR activity</p>
-                        </div>
-                    }
+                                    </li>
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <div class="text-center p-3">
+                                <p class="text-muted mb-0">No recent PR activity</p>
+                            </div>
+                        }
+                    </div>
                 </div>
             </div>
-        </div>
-        
-            
 
-            <!-- Quick Stats
-            <div class="card shadow mt-4">
-                <div class="card-header bg-info text-white">
-                    <i class="fa fa-chart-bar me-2"></i>Quick Stats
+            <!-- ── Approved PRs (collapsible) ───────────────────────────── -->
+            @{
+                var approvedPRs = ViewBag.ApprovedPRs as List<PRModel> ?? new List<PRModel>();
+            }
+            <div class="card shadow mb-4">
+                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center"
+                     role="button"
+                     data-bs-toggle="collapse"
+                     data-bs-target="#collapseApprovedPRs"
+                     aria-expanded="true"
+                     aria-controls="collapseApprovedPRs"
+                     style="cursor:pointer; user-select:none;">
+                    <span><i class="fa fa-check-circle me-2"></i>Approved PRs</span>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge bg-light text-dark">@approvedPRs.Count</span>
+                        <i class="fa fa-chevron-up collapse-chevron transition-icon"></i>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Pending PRs:</span>
-                        <span class="badge bg-warning">5</span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Approved this month:</span>
-                        <span class="badge bg-success">12</span>
-                    </div>
-                    <div class="d-flex justify-content-between">
-                        <span>Total Amount:</span>
-                        <span class="fw-bold">₱450,000.00</span>
+                <div id="collapseApprovedPRs" class="collapse show">
+                    <div class="card-body p-0">
+                        @if (approvedPRs.Any())
+                        {
+                            <ul class="list-group list-group-flush">
+                                @foreach (var pr in approvedPRs)
+                                {
+                                    <li class="list-group-item">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <strong>@pr.PRNumber</strong>
+                                                <br />
+                                                <small class="text-muted">@pr.Purpose</small>
+                                            </div>
+                                            <span class="badge bg-success">Approved</span>
+                                        </div>
+                                        <small class="text-muted d-block mt-1">
+                                            <i class="fa fa-user me-1"></i>Reviewed by: @(pr.ReviewedBy ?? "—")
+                                        </small>
+                                        @if (!string.IsNullOrEmpty(pr.ApprovalRemarks))
+                                        {
+                                            <small class="text-muted d-block">
+                                                <i class="fa fa-comment me-1"></i>@pr.ApprovalRemarks
+                                            </small>
+                                        }
+                                        <small class="text-muted d-block">
+                                            <i class="fa fa-calendar me-1"></i>
+                                            @(pr.ReviewedDate.HasValue? pr.ReviewedDate.Value.ToString("MMM dd, yyyy") : pr.SubmittedDate.ToString("MMM dd, yyyy"))
+                                        </small>
+                                    </li>
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <div class="text-center p-3">
+                                <p class="text-muted mb-0">No approved PRs yet</p>
+                            </div>
+                        }
                     </div>
                 </div>
             </div>
+
+            <!-- ── Disapproved PRs (collapsible) ────────────────────────── -->
+            @{
+                var disapprovedPRs = ViewBag.DisapprovedPRs as List<PRModel> ?? new List<PRModel>();
+            }
+            <div class="card shadow mb-4">
+                <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center"
+                     role="button"
+                     data-bs-toggle="collapse"
+                     data-bs-target="#collapseDisapprovedPRs"
+                     aria-expanded="true"
+                     aria-controls="collapseDisapprovedPRs"
+                     style="cursor:pointer; user-select:none;">
+                    <span><i class="fa fa-times-circle me-2"></i>Disapproved PRs</span>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge bg-light text-dark">@disapprovedPRs.Count</span>
+                        <i class="fa fa-chevron-up collapse-chevron transition-icon"></i>
+                    </div>
+                </div>
+                <div id="collapseDisapprovedPRs" class="collapse show">
+                    <div class="card-body p-0">
+                        @if (disapprovedPRs.Any())
+                        {
+                            <ul class="list-group list-group-flush">
+                                @foreach (var pr in disapprovedPRs)
+                                {
+                                    <li class="list-group-item">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <strong>@pr.PRNumber</strong>
+                                                <br />
+                                                <small class="text-muted">@pr.Purpose</small>
+                                            </div>
+                                            <span class="badge bg-danger">Disapproved</span>
+                                        </div>
+                                        <small class="text-muted d-block mt-1">
+                                            <i class="fa fa-user me-1"></i>Reviewed by: @(pr.ReviewedBy ?? "—")
+                                        </small>
+                                        <small class="text-muted d-block mt-1">
+                                            <i class="fa fa-user me-1"></i>Requested by: @(pr.RequestedBy ?? "—")
+                                        </small>
+                                        @if (!string.IsNullOrEmpty(pr.ApprovalRemarks))
+                                        {
+                                            <small class="text-danger d-block">
+                                                <i class="fa fa-comment me-1"></i>@pr.ApprovalRemarks
+                                            </small>
+                                        }
+                                        <small class="text-muted d-block">
+                                            <i class="fa fa-calendar me-1"></i>
+                                            @(pr.ReviewedDate.HasValue? pr.ReviewedDate.Value.ToString("MMM dd, yyyy") : pr.SubmittedDate.ToString("MMM dd, yyyy"))
+                                        </small>
+                                    </li>
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <div class="text-center p-3">
+                                <p class="text-muted mb-0">No disapproved PRs</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
         </div>
-        -->
+        <!-- end sidebar -->
     </div>
 </div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <style>
+        .transition-icon {
+            transition: transform 0.25s ease;
+        }
+    </style>
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             // Auto-hide alerts after 5 seconds
-            setTimeout(function() {
+            setTimeout(function () {
                 $(".alert").fadeOut("slow");
             }, 5000);
 
-            // Form validation
-            $("#searchForm").submit(function(e) {
+            // Search form validation
+            $("#searchForm").submit(function (e) {
                 var prNumber = $("#PRNumber").val();
                 if (!prNumber || prNumber.trim() === "") {
                     e.preventDefault();
                     alert("Please enter a PR Number");
                 }
+            });
+
+            // Rotate chevron on collapse toggle
+            // Use Bootstrap's native collapse events for reliable state tracking
+            $('[data-bs-toggle="collapse"]').each(function () {
+                var $trigger = $(this);
+                var targetId = $trigger.data('bs-target');
+                var $chevron = $trigger.find('.collapse-chevron');
+
+                $(targetId).on('hide.bs.collapse', function () {
+                    $chevron.css('transform', 'rotate(180deg)');
+                });
+
+                $(targetId).on('show.bs.collapse', function () {
+                    $chevron.css('transform', 'rotate(0deg)');
+                });
             });
         });
     </script>
